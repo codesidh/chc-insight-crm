@@ -17,6 +17,5 @@
   "htmlWhitespaceSensitivity": "css",
   "vueIndentScriptAndStyle": false,
   "singleAttributePerLine": false,
-  "jsxSingleQuote": true,
-  "jsxBracketSameLine": false
+  "plugins": ["prettier-plugin-tailwindcss"]
 }

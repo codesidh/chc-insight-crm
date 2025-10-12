@@ -1,88 +1,159 @@
-// Core type definitions for CHC Insight CRM
-
-export type Theme = 'dark' | 'light' | 'system'
-
-export type Priority = 'low' | 'medium' | 'high'
-
-export type Status = 'draft' | 'pending' | 'approved' | 'rejected' | 'completed' | 'cancelled'
-
-export type UserRole = 
-  | 'administrator'
-  | 'service_coordinator'
-  | 'um_nurse'
-  | 'qm_staff'
-  | 'communications_team'
-  | 'manager'
-
-export type SurveyType = 
-  | 'initial_assessment'
-  | 'reassessment'
-  | 'provider_survey'
-  | 'incident_report'
-  | 'satisfaction_survey'
-  | 'custom'
-
-export type QuestionType = 
-  | 'text_input'
-  | 'numeric_input'
-  | 'date'
-  | 'datetime'
-  | 'single_select'
-  | 'multi_select'
-  | 'yes_no'
-  | 'file_upload'
-  | 'section_header'
-
-// Component prop types
-export interface BaseComponentProps {
-  className?: string
-  children?: React.ReactNode
+// Core application types
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  roles: Role[];
+  tenantId: string;
+  isActive: boolean;
 }
 
-export interface StatusBadgeProps extends BaseComponentProps {
-  status: Status
-  variant?: 'default' | 'outline'
+export interface Role {
+  id: string;
+  name: string;
+  permissions: Permission[];
 }
 
-export interface PriorityBadgeProps extends BaseComponentProps {
-  priority: Priority
-  variant?: 'default' | 'outline'
+export interface Permission {
+  resource: string;
+  actions: string[];
 }
 
-// Form types
-export interface FormFieldProps extends BaseComponentProps {
-  label?: string
-  description?: string
-  error?: string
-  required?: boolean
+export interface Tenant {
+  id: string;
+  name: string;
+  subdomain?: string;
+  configuration: Record<string, any>;
+  isActive: boolean;
 }
 
-// Chart types for data visualization
-export interface ChartDataPoint {
-  name: string
-  value: number
-  color?: string
+// Survey types
+export interface SurveyTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  type: SurveyType;
+  version: number;
+  tenantId: string;
+  questions: Question[];
+  businessRules: BusinessRule[];
+  workflow: WorkflowConfig;
+  isActive: boolean;
+  effectiveDate: Date;
+  expirationDate?: Date;
+  createdBy: string;
 }
 
-export interface ChartConfig {
-  [key: string]: {
-    label: string
-    color: string
-  }
+export interface Question {
+  id: string;
+  type: QuestionType;
+  text: string;
+  required: boolean;
+  validation: ValidationRule[];
+  conditionalLogic?: ConditionalRule[];
+  options?: QuestionOption[];
+  defaultValue?: any;
+  helpText?: string;
+  prePopulationMapping?: string;
 }
 
-// API response types
-export interface ApiResponse<T = any> {
-  data: T
-  message?: string
-  success: boolean
+export interface SurveyInstance {
+  id: string;
+  templateId: string;
+  tenantId: string;
+  memberId?: string;
+  providerId?: string;
+  assignedTo?: string;
+  status: SurveyStatus;
+  responseData?: Record<string, any>;
+  contextData?: Record<string, any>;
+  dueDate?: Date;
+  submittedAt?: Date;
+  approvedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
+// Enums
+export enum SurveyType {
+  INITIAL_ASSESSMENT = 'initial_assessment',
+  REASSESSMENT = 'reassessment',
+  PROVIDER_SURVEY = 'provider_survey',
+  INCIDENT_REPORT = 'incident_report',
+  SATISFACTION_SURVEY = 'satisfaction_survey',
+  CUSTOM = 'custom',
+}
+
+export enum QuestionType {
+  TEXT_INPUT = 'text_input',
+  NUMERIC_INPUT = 'numeric_input',
+  DATE = 'date',
+  DATETIME = 'datetime',
+  SINGLE_SELECT = 'single_select',
+  MULTI_SELECT = 'multi_select',
+  YES_NO = 'yes_no',
+  FILE_UPLOAD = 'file_upload',
+  SECTION_HEADER = 'section_header',
+}
+
+export enum SurveyStatus {
+  DRAFT = 'draft',
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
+export enum UserRole {
+  ADMINISTRATOR = 'administrator',
+  SERVICE_COORDINATOR = 'service_coordinator',
+  UM_NURSE = 'um_nurse',
+  QM_STAFF = 'qm_staff',
+  COMMUNICATIONS_TEAM = 'communications_team',
+  MANAGER = 'manager',
+}
+
+// Additional interfaces
+export interface ValidationRule {
+  type: string;
+  value?: any;
+  message: string;
+}
+
+export interface ConditionalRule {
+  condition: string;
+  action: string;
+  targetQuestionId: string;
+}
+
+export interface QuestionOption {
+  id: string;
+  label: string;
+  value: any;
+}
+
+export interface BusinessRule {
+  id: string;
+  type: string;
+  configuration: Record<string, any>;
+}
+
+export interface WorkflowConfig {
+  states: WorkflowState[];
+  transitions: WorkflowTransition[];
+}
+
+export interface WorkflowState {
+  id: string;
+  name: string;
+  type: 'initial' | 'intermediate' | 'final';
+}
+
+export interface WorkflowTransition {
+  from: string;
+  to: string;
+  trigger: string;
+  conditions?: Record<string, any>;
 }

@@ -4,8 +4,8 @@ node_modules/
 # Build outputs
 .next/
 out/
-dist/
 build/
+dist/
 
 # Environment files
 .env*
@@ -16,18 +16,19 @@ build/
 # Coverage
 coverage/
 
-# Cache
-.cache/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# IDE files
-.vscode/
-.idea/
+# Generated files
+next-env.d.ts
+*.d.ts
 
 # Package manager files
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
