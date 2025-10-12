@@ -1,0 +1,27 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "prettier"
+  ],
+  "rules": {
+    // Basic rules matching backend
+    "no-console": "off",
+    "prefer-const": "error",
+    "no-var": "error",
+    "object-shorthand": "error",
+    "prefer-template": "error",
+    
+    // React specific rules
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off"
+  },
+  "ignorePatterns": [
+    ".next/",
+    "out/",
+    "dist/",
+    "node_modules/",
+    "coverage/",
+    "*.js",
+    "*.d.ts"
+  ]
+}
