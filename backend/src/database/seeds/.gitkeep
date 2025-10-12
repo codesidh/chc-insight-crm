@@ -1,0 +1,2 @@
+# This file ensures the seeds directory is tracked by git
+# Seed files will be created here when implementing the database schema in task 5

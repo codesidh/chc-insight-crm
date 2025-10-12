@@ -1,0 +1,51 @@
+{
+  "name": "chc-insight-crm",
+  "version": "1.0.0",
+  "description": "CHC Insight CRM - A comprehensive CRM application for Long-Term Services and Supports (LTSS) business within Managed Care Organization (MCO) environments",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "build": "npm run build --workspaces",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend",
+    "start": "npm run start --workspace=backend",
+    "test": "npm run test --workspaces",
+    "test:frontend": "npm run test --workspace=frontend",
+    "test:backend": "npm run test --workspace=backend",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "clean": "npm run clean --workspaces && rimraf node_modules",
+    "install:all": "npm install",
+    "postinstall": "npm run postinstall --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/chc-insight-crm.git"
+  },
+  "keywords": [
+    "crm",
+    "healthcare",
+    "ltss",
+    "mco",
+    "survey",
+    "assessment",
+    "compliance",
+    "workflow"
+  ],
+  "author": "CHC Development Team",
+  "license": "UNLICENSED"
+}

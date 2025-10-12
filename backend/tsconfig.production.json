@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": false,
+    "removeComments": true,
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": false,
+    "tsBuildInfoFile": null
+  },
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/__tests__/**",
+    "src/**/__mocks__/**",
+    "src/scripts/**",
+    "jest.config.js",
+    "jest.setup.js",
+    "jest.global-setup.js",
+    "jest.global-teardown.js"
+  ]
+}
