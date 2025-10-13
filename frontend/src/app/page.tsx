@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
-
+// This page is redirected to /dashboard via next.config.ts
+// This component should never render due to the redirect
 export default function HomePage() {
-  redirect('/dashboard');
+  return null;
 }

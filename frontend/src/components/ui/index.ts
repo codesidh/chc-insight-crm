@@ -74,3 +74,10 @@ export {
   ChartLegend,
   ChartLegendContent
 } from './chart'
+export { 
+  MetricCard, 
+  MemberMetricCard, 
+  ProviderMetricCard, 
+  ComplianceMetricCard,
+  type MetricCardProps 
+} from './metric-card'
