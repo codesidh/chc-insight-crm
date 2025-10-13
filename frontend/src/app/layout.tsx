@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { config } from '@/config';
-import { ThemeProvider } from '@/components/providers/theme-provider';
+
 import { ThemeScript } from '@/components/providers/theme-script';
+import { Providers } from '@/providers';
 import { cn } from '@/lib/utils';
 
 const inter = Inter({
@@ -58,9 +59,9 @@ export default function RootLayout({
           inter.variable
         )}
       >
-        <ThemeProvider>
+        <Providers>
           {children}
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

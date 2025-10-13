@@ -48,3 +48,29 @@ export { Badge, badgeVariants } from './badge'
 export { Label } from './label'
 export { Switch } from './switch'
 export { Textarea } from './textarea'
+export { AdvancedDataTable, dataTableSchema, type DataTableItem } from './advanced-data-table'
+export { Checkbox } from './checkbox'
+export { 
+  Tabs, 
+  TabsList, 
+  TabsTrigger, 
+  TabsContent 
+} from './tabs'
+export {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger
+} from './drawer'
+export type { ChartConfig } from './chart'
+export {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent
+} from './chart'
