@@ -1,0 +1,99 @@
+{
+  "pageInfo": {
+    "title": "Survey Management",
+    "description": "Create, manage, and deploy surveys with conditional logic and compliance tracking."
+  },
+  "stats": [
+    {
+      "id": "total-surveys",
+      "title": "Total Surveys",
+      "value": "24",
+      "change": "+3",
+      "changeLabel": "this month",
+      "icon": "FileText",
+      "changeType": "positive"
+    },
+    {
+      "id": "active-surveys",
+      "title": "Active Surveys",
+      "value": "12",
+      "change": null,
+      "changeLabel": "Currently deployed",
+      "icon": "CheckCircle",
+      "changeType": "neutral"
+    },
+    {
+      "id": "total-responses",
+      "title": "Total Responses",
+      "value": "1,847",
+      "change": "+127",
+      "changeLabel": "this week",
+      "icon": "Users",
+      "changeType": "positive"
+    },
+    {
+      "id": "avg-completion",
+      "title": "Avg Completion",
+      "value": "8.5m",
+      "change": null,
+      "changeLabel": "Average completion time",
+      "icon": "Clock",
+      "changeType": "neutral"
+    }
+  ],
+  "surveys": [
+    {
+      "id": "member-satisfaction-q4",
+      "title": "Member Satisfaction Q4 2024",
+      "description": "Healthcare satisfaction assessment • 15 questions",
+      "status": "Active",
+      "statusVariant": "default",
+      "createdDate": "Dec 1, 2024",
+      "icon": "FileText",
+      "iconColor": "primary"
+    },
+    {
+      "id": "provider-quality-assessment",
+      "title": "Provider Quality Assessment",
+      "description": "Annual provider evaluation • 28 questions",
+      "status": "Draft",
+      "statusVariant": "secondary",
+      "createdDate": "Nov 28, 2024",
+      "icon": "FileText",
+      "iconColor": "secondary"
+    },
+    {
+      "id": "care-plan-effectiveness",
+      "title": "Care Plan Effectiveness Survey",
+      "description": "Member care plan feedback • 12 questions",
+      "status": "Completed",
+      "statusVariant": "outline",
+      "createdDate": "Nov 15, 2024",
+      "icon": "FileText",
+      "iconColor": "green"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "create-new-survey",
+      "title": "Create New Survey",
+      "description": "Start with a template or build from scratch",
+      "icon": "Plus",
+      "iconColor": "primary"
+    },
+    {
+      "id": "schedule-deployment",
+      "title": "Schedule Deployment",
+      "description": "Plan survey releases and campaigns",
+      "icon": "Calendar",
+      "iconColor": "blue"
+    },
+    {
+      "id": "survey-templates",
+      "title": "Survey Templates",
+      "description": "Browse pre-built survey templates",
+      "icon": "FileText",
+      "iconColor": "green"
+    }
+  ]
+}

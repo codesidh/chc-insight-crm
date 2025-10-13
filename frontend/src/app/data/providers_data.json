@@ -1,0 +1,114 @@
+{
+  "pageInfo": {
+    "title": "Provider Network",
+    "description": "Manage healthcare providers, track performance, and monitor quality metrics."
+  },
+  "stats": [
+    {
+      "id": "total-providers",
+      "title": "Total Providers",
+      "value": "342",
+      "change": "+12",
+      "changeLabel": "this month",
+      "icon": "Building2",
+      "changeType": "positive"
+    },
+    {
+      "id": "active-providers",
+      "title": "Active Providers",
+      "value": "318",
+      "change": null,
+      "changeLabel": "93.0% of network",
+      "icon": "CheckCircle",
+      "changeType": "neutral"
+    },
+    {
+      "id": "avg-rating",
+      "title": "Avg Rating",
+      "value": "4.6",
+      "change": null,
+      "changeLabel": "Based on member feedback",
+      "icon": "Star",
+      "changeType": "neutral"
+    },
+    {
+      "id": "quality-issues",
+      "title": "Quality Issues",
+      "value": "7",
+      "change": null,
+      "changeLabel": "Require attention",
+      "icon": "AlertTriangle",
+      "changeType": "neutral"
+    }
+  ],
+  "providers": [
+    {
+      "id": "chicago-medical-center",
+      "name": "Chicago Medical Center",
+      "specialty": "Primary Care • Internal Medicine",
+      "phone": "(312) 555-0123",
+      "email": "info@chicagomedical.com",
+      "location": "Chicago, IL",
+      "memberCount": "247 members",
+      "status": "Active",
+      "statusVariant": "default",
+      "rating": "4.8",
+      "networkSince": "2019",
+      "icon": "Building2",
+      "iconColor": "primary"
+    },
+    {
+      "id": "riverside-behavioral-health",
+      "name": "Riverside Behavioral Health",
+      "specialty": "Mental Health • Counseling Services",
+      "phone": "(312) 555-0456",
+      "email": "contact@riverside-bh.com",
+      "location": "Riverside, IL",
+      "memberCount": "89 members",
+      "status": "Under Review",
+      "statusVariant": "secondary",
+      "rating": "4.2",
+      "networkSince": "2021",
+      "icon": "Building2",
+      "iconColor": "blue"
+    },
+    {
+      "id": "northshore-rehabilitation",
+      "name": "Northshore Rehabilitation Center",
+      "specialty": "Physical Therapy • Occupational Therapy",
+      "phone": "(847) 555-0789",
+      "email": "info@northshore-rehab.com",
+      "location": "Evanston, IL",
+      "memberCount": "156 members",
+      "status": "Active",
+      "statusVariant": "default",
+      "rating": "4.9",
+      "networkSince": "2020",
+      "icon": "Building2",
+      "iconColor": "green"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "add-provider",
+      "title": "Add Provider",
+      "description": "Onboard a new healthcare provider",
+      "icon": "Plus",
+      "iconColor": "primary"
+    },
+    {
+      "id": "quality-reports",
+      "title": "Quality Reports",
+      "description": "View provider performance metrics",
+      "icon": "Star",
+      "iconColor": "blue"
+    },
+    {
+      "id": "review-queue",
+      "title": "Review Queue",
+      "description": "Providers requiring attention",
+      "icon": "AlertTriangle",
+      "iconColor": "yellow"
+    }
+  ]
+}

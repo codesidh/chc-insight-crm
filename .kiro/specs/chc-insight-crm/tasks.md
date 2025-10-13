@@ -98,6 +98,11 @@
 
 
 
+
+
+
+
+
     - Initialize shadcn/ui with components.json configuration
     - Set up Tailwind CSS v4 with oklch color system and custom design tokens
     - Install essential shadcn components: Button, Card, Input, Select, Dialog, Table, Badge

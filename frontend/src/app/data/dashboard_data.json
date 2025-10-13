@@ -1,0 +1,150 @@
+{
+  "appName": "CHC Insight",
+  "welcomeMessage": {
+    "title": "Welcome to CHC Insight",
+    "description": "Comprehensive CRM for Long-Term Services and Supports (LTSS) within MCO environments."
+  },
+  "stats": [
+    {
+      "id": "active-surveys",
+      "title": "Active Surveys",
+      "value": "12",
+      "change": "+2",
+      "changeLabel": "from last month",
+      "icon": "FileText",
+      "changeType": "positive"
+    },
+    {
+      "id": "total-members",
+      "title": "Total Members",
+      "value": "2,847",
+      "change": "+180",
+      "changeLabel": "from last month",
+      "icon": "Users",
+      "changeType": "positive"
+    },
+    {
+      "id": "completion-rate",
+      "title": "Completion Rate",
+      "value": "94.2%",
+      "change": "+2.1%",
+      "changeLabel": "from last month",
+      "icon": "TrendingUp",
+      "changeType": "positive"
+    },
+    {
+      "id": "pending-reviews",
+      "title": "Pending Reviews",
+      "value": "23",
+      "change": "-5",
+      "changeLabel": "from yesterday",
+      "icon": "Activity",
+      "changeType": "negative"
+    }
+  ],
+  "featureCards": [
+    {
+      "id": "dynamic-surveys",
+      "title": "Dynamic Surveys",
+      "description": "Create surveys with conditional logic",
+      "icon": "FileText",
+      "buttonText": "Manage Surveys"
+    },
+    {
+      "id": "analytics-reports",
+      "title": "Analytics & Reports",
+      "description": "Performance and compliance tracking",
+      "icon": "BarChart3",
+      "buttonText": "View Analytics"
+    },
+    {
+      "id": "member-management",
+      "title": "Member Management",
+      "description": "Track member information and status",
+      "icon": "Users",
+      "buttonText": "Manage Members"
+    }
+  ],
+  "recentActivity": [
+    {
+      "id": "survey-completed",
+      "title": "Survey \"Member Satisfaction Q4\" completed",
+      "time": "2 hours ago",
+      "icon": "CheckCircle",
+      "iconColor": "green"
+    },
+    {
+      "id": "members-added",
+      "title": "45 new members added to system",
+      "time": "5 hours ago",
+      "icon": "Users",
+      "iconColor": "blue"
+    },
+    {
+      "id": "workflow-pending",
+      "title": "Workflow approval pending review",
+      "time": "1 day ago",
+      "icon": "Clock",
+      "iconColor": "yellow"
+    }
+  ],
+  "systemStatus": [
+    {
+      "id": "frontend-infrastructure",
+      "title": "Frontend Infrastructure",
+      "status": "Complete",
+      "variant": "default",
+      "icon": "CheckCircle"
+    },
+    {
+      "id": "backend-infrastructure",
+      "title": "Backend Infrastructure",
+      "status": "Complete",
+      "variant": "default",
+      "icon": "CheckCircle"
+    },
+    {
+      "id": "ui-components",
+      "title": "UI Components",
+      "status": "Complete",
+      "variant": "default",
+      "icon": "CheckCircle"
+    },
+    {
+      "id": "survey-engine",
+      "title": "Survey Engine",
+      "status": "In Progress",
+      "variant": "secondary",
+      "icon": "Clock"
+    },
+    {
+      "id": "authentication-system",
+      "title": "Authentication System",
+      "status": "Pending",
+      "variant": "outline",
+      "icon": "AlertCircle"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "create-survey",
+      "title": "Create Survey",
+      "icon": "FileText"
+    },
+    {
+      "id": "add-member",
+      "title": "Add Member",
+      "icon": "Users"
+    },
+    {
+      "id": "view-reports",
+      "title": "View Reports",
+      "icon": "BarChart3"
+    },
+    {
+      "id": "schedule-review",
+      "title": "Schedule Review",
+      "icon": "Calendar"
+    }
+  ]
+}

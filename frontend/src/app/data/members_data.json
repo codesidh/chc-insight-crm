@@ -1,0 +1,108 @@
+{
+  "pageInfo": {
+    "title": "Member Management",
+    "description": "Manage member information, track care plans, and monitor engagement."
+  },
+  "stats": [
+    {
+      "id": "total-members",
+      "title": "Total Members",
+      "value": "2,847",
+      "change": "+180",
+      "changeLabel": "this month",
+      "icon": "Users",
+      "changeType": "positive"
+    },
+    {
+      "id": "active-members",
+      "title": "Active Members",
+      "value": "2,654",
+      "change": null,
+      "changeLabel": "93.2% of total members",
+      "icon": "Activity",
+      "changeType": "neutral"
+    },
+    {
+      "id": "pending-reviews",
+      "title": "Pending Reviews",
+      "value": "47",
+      "change": null,
+      "changeLabel": "Require care plan updates",
+      "icon": "AlertCircle",
+      "changeType": "neutral"
+    },
+    {
+      "id": "new-this-week",
+      "title": "New This Week",
+      "value": "23",
+      "change": null,
+      "changeLabel": "New member enrollments",
+      "icon": "Calendar",
+      "changeType": "neutral"
+    }
+  ],
+  "members": [
+    {
+      "id": "member-001847",
+      "name": "Sarah Johnson",
+      "memberId": "CHC-2024-001847",
+      "phone": "(555) 123-4567",
+      "email": "sarah.j@email.com",
+      "location": "Chicago, IL",
+      "status": "Active",
+      "statusVariant": "default",
+      "enrolledDate": "Jan 15, 2024",
+      "icon": "Users",
+      "iconColor": "primary"
+    },
+    {
+      "id": "member-001823",
+      "name": "Michael Chen",
+      "memberId": "CHC-2024-001823",
+      "phone": "(555) 987-6543",
+      "email": "m.chen@email.com",
+      "location": "Houston, TX",
+      "status": "Pending Review",
+      "statusVariant": "secondary",
+      "enrolledDate": "Mar 8, 2024",
+      "icon": "Users",
+      "iconColor": "blue"
+    },
+    {
+      "id": "member-001756",
+      "name": "Emily Rodriguez",
+      "memberId": "CHC-2024-001756",
+      "phone": "(555) 456-7890",
+      "email": "emily.r@email.com",
+      "location": "Phoenix, AZ",
+      "status": "Active",
+      "statusVariant": "default",
+      "enrolledDate": "Feb 22, 2024",
+      "icon": "Users",
+      "iconColor": "green"
+    }
+  ],
+  "quickActions": [
+    {
+      "id": "add-new-member",
+      "title": "Add New Member",
+      "description": "Enroll a new member in the system",
+      "icon": "Plus",
+      "iconColor": "primary"
+    },
+    {
+      "id": "bulk-import",
+      "title": "Bulk Import",
+      "description": "Import members from CSV or Excel",
+      "icon": "Activity",
+      "iconColor": "blue"
+    },
+    {
+      "id": "review-queue",
+      "title": "Review Queue",
+      "description": "Members requiring attention",
+      "icon": "AlertCircle",
+      "iconColor": "yellow"
+    }
+  ]
+}

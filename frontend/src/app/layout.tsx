@@ -2,10 +2,15 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { config } from '@/config';
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { ThemeScript } from '@/components/providers/theme-script';
+import { cn } from '@/lib/utils';
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -23,12 +28,17 @@ export const metadata: Metadata = {
     index: config.app.environment === 'production',
     follow: config.app.environment === 'production',
   },
+  metadataBase: new URL('http://localhost:3000'),
 };
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
 };
 
 export default function RootLayout({
@@ -38,8 +48,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <div id="root">{children}</div>
+      <head>
+        <ThemeScript />
+
+      </head>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          inter.variable
+        )}
+      >
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

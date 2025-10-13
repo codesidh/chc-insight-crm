@@ -64,17 +64,17 @@ graph TB
 ### Technology Stack
 
 **Frontend:** 
-- React 18 with TypeScript
-- Next.js 14 with App Router
-- Component libraries: shadcn/ui with modern oklch color system
-- Styling: Tailwind CSS v3 with PostCSS
-- Form handling: TanStack Form (v0.29.0) with Zod validation
+- Framework: Next.js 15 with App Router
+- Language: React 19 with TypeScript (strict mode enabled)
+- UI Library: shadcn/ui with modern oklch color system
+- Styling: Tailwind CSS v4
+- Form Handling: React Hook Form with Zod validation
 - State Management: TanStack Query for server state and caching
 - Router: TanStack Router for type-safe navigation
 - Charts: Recharts with shadcn chart components
+- Data Tables: TanStack Table with shadcn table components
 - Icons: Lucide React
 - Animation: CSS transitions and transforms (Framer Motion optional)
-- Data Tables: TanStack Table with shadcn table components
 
 **Modern Frontend Architecture**
 ```
@@ -1367,4 +1367,926 @@ export const useNotifications = () => {
 }
 ```
 
-This comprehensive design document now reflects the modern frontend architecture with shadcn/ui, TanStack Query, and contemporary React patterns while maintaining the robust backend design for the CHC Insight CRM application.
+This comprehensive design document now reflects the modern frontend architecture with shadcn/ui, TanStack Query, and contemporary React patterns while maintaining the robust backend design for the CHC Insight CRM application.gn for 
+healthcare compliance and scalability.
+
+## Error Handling
+
+### Frontend Error Handling Strategy
+
+#### Error Boundaries and Graceful Degradation
+```typescript
+// Global error boundary for unhandled React errors
+class GlobalErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Log error to monitoring service
+    errorReportingService.captureException(error, {
+      extra: errorInfo,
+      tags: { component: 'GlobalErrorBoundary' }
+    })
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback error={this.state.error} />
+    }
+    return this.props.children
+  }
+}
+
+// Feature-specific error boundaries
+const SurveyBuilderErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ErrorBoundary
+    fallback={<SurveyBuilderErrorFallback />}
+    onError={(error, errorInfo) => {
+      errorReportingService.captureException(error, {
+        tags: { feature: 'survey-builder' },
+        extra: errorInfo
+      })
+    }}
+  >
+    {children}
+  </ErrorBoundary>
+)
+```
+
+#### API Error Handling with TanStack Query
+```typescript
+// Centralized API error handling
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    public code: string,
+    message: string,
+    public details?: any
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
+// API client with comprehensive error handling
+export const apiClient = {
+  async request<T>(endpoint: string, options: RequestOptions): Promise<T> {
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new ApiError(
+          response.status,
+          errorData.code || 'UNKNOWN_ERROR',
+          errorData.message || 'An unexpected error occurred',
+          errorData.details
+        )
+      }
+
+      return await response.json()
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error
+      }
+      
+      // Network or parsing errors
+      throw new ApiError(
+        0,
+        'NETWORK_ERROR',
+        'Unable to connect to the server. Please check your connection.',
+        { originalError: error }
+      )
+    }
+  }
+}
+
+// TanStack Query error handling configuration
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
+          return false // Don't retry client errors
+        }
+        return failureCount < 3
+      },
+      onError: (error) => {
+        if (error instanceof ApiError) {
+          toast.error(error.message)
+          
+          // Handle specific error cases
+          if (error.status === 401) {
+            authService.logout()
+            router.push('/login')
+          }
+        }
+      }
+    },
+    mutations: {
+      onError: (error) => {
+        if (error instanceof ApiError) {
+          toast.error(error.message)
+        }
+      }
+    }
+  }
+})
+```
+
+### Backend Error Handling Strategy
+
+#### Structured Error Response Format
+```typescript
+// Standardized error response interface
+interface ErrorResponse {
+  success: false
+  error: {
+    code: string
+    message: string
+    details?: any
+    timestamp: string
+    requestId: string
+  }
+}
+
+// Custom error classes for business logic
+export class ValidationError extends Error {
+  constructor(
+    message: string,
+    public field?: string,
+    public value?: any
+  ) {
+    super(message)
+    this.name = 'ValidationError'
+  }
+}
+
+export class BusinessRuleError extends Error {
+  constructor(
+    message: string,
+    public rule: string,
+    public context?: any
+  ) {
+    super(message)
+    this.name = 'BusinessRuleError'
+  }
+}
+
+export class AuthorizationError extends Error {
+  constructor(
+    message: string,
+    public resource?: string,
+    public action?: string
+  ) {
+    super(message)
+    this.name = 'AuthorizationError'
+  }
+}
+```
+
+#### Global Error Handler Middleware
+```typescript
+export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
+  const requestId = req.headers['x-request-id'] as string || generateRequestId()
+  
+  // Log error with context for debugging and monitoring
+  logger.error('Request error', {
+    error: error.message,
+    stack: error.stack,
+    requestId,
+    method: req.method,
+    url: req.url,
+    userId: req.user?.id,
+    tenantId: req.user?.tenantId
+  })
+
+  // Handle specific error types with appropriate HTTP status codes
+  if (error instanceof ValidationError) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: error.message,
+        details: { field: error.field, value: error.value },
+        timestamp: new Date().toISOString(),
+        requestId
+      }
+    })
+  }
+
+  if (error instanceof BusinessRuleError) {
+    return res.status(422).json({
+      success: false,
+      error: {
+        code: 'BUSINESS_RULE_VIOLATION',
+        message: error.message,
+        details: { rule: error.rule, context: error.context },
+        timestamp: new Date().toISOString(),
+        requestId
+      }
+    })
+  }
+
+  if (error instanceof AuthorizationError) {
+    return res.status(403).json({
+      success: false,
+      error: {
+        code: 'AUTHORIZATION_ERROR',
+        message: error.message,
+        details: { resource: error.resource, action: error.action },
+        timestamp: new Date().toISOString(),
+        requestId
+      }
+    })
+  }
+
+  // Default server error response
+  res.status(500).json({
+    success: false,
+    error: {
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'An unexpected error occurred',
+      timestamp: new Date().toISOString(),
+      requestId
+    }
+  })
+}
+```
+
+#### Database Error Handling and Transaction Management
+```typescript
+// Database transaction wrapper with comprehensive error handling
+export const withTransaction = async <T>(
+  callback: (trx: Knex.Transaction) => Promise<T>
+): Promise<T> => {
+  const trx = await db.transaction()
+  
+  try {
+    const result = await callback(trx)
+    await trx.commit()
+    return result
+  } catch (error) {
+    await trx.rollback()
+    
+    // Handle specific PostgreSQL error codes
+    if (error.code === '23505') { // Unique constraint violation
+      throw new ValidationError('Duplicate entry detected', error.constraint)
+    }
+    
+    if (error.code === '23503') { // Foreign key constraint violation
+      throw new ValidationError('Referenced record not found', error.constraint)
+    }
+    
+    if (error.code === '23514') { // Check constraint violation
+      throw new ValidationError('Data validation failed', error.constraint)
+    }
+    
+    throw error
+  }
+}
+```
+
+## Testing Strategy
+
+### Frontend Testing Approach
+
+#### Unit Testing with Jest and React Testing Library
+```typescript
+// Component testing example for survey builder
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SurveyBuilder } from '@/components/features/survey-builder/SurveyBuilder'
+
+describe('SurveyBuilder', () => {
+  let queryClient: QueryClient
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false }
+      }
+    })
+  })
+
+  const renderWithProviders = (component: React.ReactElement) => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
+    )
+  }
+
+  it('should render question type library with all question types', () => {
+    renderWithProviders(<SurveyBuilder />)
+    
+    expect(screen.getByText('Text Input')).toBeInTheDocument()
+    expect(screen.getByText('Single Select')).toBeInTheDocument()
+    expect(screen.getByText('Multi Select')).toBeInTheDocument()
+    expect(screen.getByText('Yes/No')).toBeInTheDocument()
+    expect(screen.getByText('File Upload')).toBeInTheDocument()
+  })
+
+  it('should add question when dragged from library to canvas', async () => {
+    renderWithProviders(<SurveyBuilder />)
+    
+    const textInputButton = screen.getByText('Text Input')
+    fireEvent.dragStart(textInputButton)
+    
+    const canvas = screen.getByTestId('survey-canvas')
+    fireEvent.drop(canvas)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Question 1')).toBeInTheDocument()
+    })
+  })
+
+  it('should validate survey template before saving', async () => {
+    renderWithProviders(<SurveyBuilder />)
+    
+    const saveButton = screen.getByText('Save Template')
+    fireEvent.click(saveButton)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Survey name is required')).toBeInTheDocument()
+    })
+  })
+})
+
+// Custom hook testing example
+import { renderHook, waitFor } from '@testing-library/react'
+import { useAutoSave } from '@/hooks/useAutoSave'
+
+describe('useAutoSave', () => {
+  it('should call save function after specified delay', async () => {
+    const mockSave = jest.fn()
+    const { rerender } = renderHook(
+      ({ data }) => useAutoSave(data, mockSave, { delay: 100 }),
+      { initialProps: { data: { name: 'test' } } }
+    )
+
+    rerender({ data: { name: 'updated' } })
+
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenCalledWith({ name: 'updated' })
+    }, { timeout: 200 })
+  })
+
+  it('should not save if data has not changed', async () => {
+    const mockSave = jest.fn()
+    renderHook(() => useAutoSave({ name: 'test' }, mockSave, { delay: 100 }))
+
+    await new Promise(resolve => setTimeout(resolve, 150))
+    expect(mockSave).not.toHaveBeenCalled()
+  })
+})
+```
+
+#### Integration Testing for API Interactions
+```typescript
+// API integration testing with MSW
+import { apiClient } from '@/lib/api'
+import { server } from '@/test/mocks/server'
+
+describe('Survey API Integration', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
+  it('should create survey template successfully', async () => {
+    const template = {
+      name: 'Member Assessment',
+      type: 'initial_assessment',
+      questions: [
+        { type: 'text_input', text: 'What is your primary concern?', required: true }
+      ]
+    }
+
+    const result = await apiClient.post('/api/surveys/templates', template)
+    
+    expect(result.id).toBeDefined()
+    expect(result.name).toBe('Member Assessment')
+    expect(result.questions).toHaveLength(1)
+    expect(result.version).toBe(1)
+  })
+
+  it('should handle validation errors appropriately', async () => {
+    const invalidTemplate = { name: '' }
+
+    await expect(
+      apiClient.post('/api/surveys/templates', invalidTemplate)
+    ).rejects.toThrow('Survey name is required')
+  })
+})
+```
+
+#### End-to-End Testing with Playwright
+```typescript
+// E2E testing for complete user workflows
+import { test, expect } from '@playwright/test'
+
+test.describe('Survey Creation and Execution Flow', () => {
+  test.beforeEach(async ({ page }) => {
+    // Login as administrator
+    await page.goto('/login')
+    await page.fill('[data-testid="email-input"]', 'admin@test.com')
+    await page.fill('[data-testid="password-input"]', 'password')
+    await page.click('[data-testid="login-button"]')
+    await expect(page).toHaveURL('/dashboard')
+  })
+
+  test('should create, preview, and execute survey end-to-end', async ({ page }) => {
+    // Navigate to survey builder
+    await page.goto('/dashboard/surveys')
+    await page.click('[data-testid="create-survey-button"]')
+    
+    // Create survey template
+    await page.fill('[data-testid="survey-name-input"]', 'Member Assessment')
+    await page.selectOption('[data-testid="survey-type-select"]', 'initial_assessment')
+    
+    // Add questions using drag and drop
+    await page.dragAndDrop(
+      '[data-testid="text-input-question"]',
+      '[data-testid="survey-canvas"]'
+    )
+    
+    // Configure question
+    await page.fill('[data-testid="question-text-input"]', 'What is your primary concern?')
+    await page.check('[data-testid="question-required-checkbox"]')
+    
+    // Add conditional logic
+    await page.dragAndDrop(
+      '[data-testid="yes-no-question"]',
+      '[data-testid="survey-canvas"]'
+    )
+    await page.fill('[data-testid="question-text-input"]', 'Do you need immediate assistance?')
+    
+    // Save template
+    await page.click('[data-testid="save-template-button"]')
+    await expect(page.locator('text=Template saved successfully')).toBeVisible()
+    
+    // Preview survey
+    await page.click('[data-testid="preview-button"]')
+    await expect(page.locator('[data-testid="preview-modal"]')).toBeVisible()
+    await expect(page.locator('text=What is your primary concern?')).toBeVisible()
+    
+    // Execute survey as service coordinator
+    await page.goto('/dashboard/work-queue')
+    await page.click('[data-testid="start-survey-button"]')
+    
+    // Fill out survey
+    await page.fill('[data-testid="member-search"]', 'John Doe')
+    await page.click('[data-testid="member-result-0"]')
+    await page.fill('textarea[name="primary-concern"]', 'Need help with daily activities')
+    await page.click('input[name="immediate-assistance"][value="yes"]')
+    
+    // Submit survey
+    await page.click('[data-testid="submit-survey-button"]')
+    await expect(page.locator('text=Survey submitted for review')).toBeVisible()
+  })
+})
+```
+
+### Backend Testing Strategy
+
+#### Unit Testing for Services and Business Logic
+```typescript
+// Service testing example
+import { SurveyService } from '@/services/SurveyService'
+import { mockDb } from '@/test/mocks/database'
+
+describe('SurveyService', () => {
+  let surveyService: SurveyService
+
+  beforeEach(() => {
+    surveyService = new SurveyService(mockDb)
+  })
+
+  describe('createTemplate', () => {
+    it('should create survey template with correct version', async () => {
+      const template = {
+        name: 'Test Survey',
+        tenantId: 'tenant-1',
+        type: 'initial_assessment',
+        questions: []
+      }
+
+      const result = await surveyService.createTemplate(template)
+
+      expect(result.version).toBe(1)
+      expect(result.isActive).toBe(true)
+      expect(result.effectiveDate).toBeInstanceOf(Date)
+      expect(mockDb.insert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Test Survey',
+          version: 1,
+          is_active: true
+        })
+      )
+    })
+
+    it('should validate required fields', async () => {
+      const invalidTemplate = { name: '', tenantId: 'tenant-1' }
+
+      await expect(
+        surveyService.createTemplate(invalidTemplate)
+      ).rejects.toThrow(ValidationError)
+    })
+
+    it('should enforce business rules for survey types', async () => {
+      const template = {
+        name: 'Test Survey',
+        tenantId: 'tenant-1',
+        type: 'invalid_type',
+        questions: []
+      }
+
+      await expect(
+        surveyService.createTemplate(template)
+      ).rejects.toThrow(BusinessRuleError)
+    })
+  })
+
+  describe('validateResponses', () => {
+    it('should validate required fields', async () => {
+      const template = {
+        questions: [
+          { id: 'q1', type: 'text_input', required: true, text: 'Required question' }
+        ]
+      }
+      const responses = [
+        { questionId: 'q1', value: '' }
+      ]
+
+      const result = await surveyService.validateResponses(responses, template)
+
+      expect(result.isValid).toBe(false)
+      expect(result.errors).toContain('Required question is required')
+    })
+  })
+})
+```
+
+#### API Controller Testing
+```typescript
+// Controller testing with supertest
+import request from 'supertest'
+import { app } from '@/app'
+import { generateAuthToken } from '@/test/helpers/auth'
+
+describe('Survey API Controllers', () => {
+  const adminToken = generateAuthToken({ 
+    userId: 'user-1', 
+    tenantId: 'tenant-1',
+    roles: ['administrator'] 
+  })
+
+  const coordinatorToken = generateAuthToken({
+    userId: 'user-2',
+    tenantId: 'tenant-1', 
+    roles: ['service_coordinator']
+  })
+
+  describe('POST /api/surveys/templates', () => {
+    it('should create survey template with admin permissions', async () => {
+      const template = {
+        name: 'Test Survey',
+        type: 'initial_assessment',
+        questions: [
+          { type: 'text_input', text: 'Question 1', required: true }
+        ]
+      }
+
+      const response = await request(app)
+        .post('/api/surveys/templates')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(template)
+        .expect(201)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.name).toBe('Test Survey')
+      expect(response.body.data.version).toBe(1)
+    })
+
+    it('should reject unauthorized access', async () => {
+      const response = await request(app)
+        .post('/api/surveys/templates')
+        .set('Authorization', `Bearer ${coordinatorToken}`)
+        .send({})
+        .expect(403)
+
+      expect(response.body.success).toBe(false)
+      expect(response.body.error.code).toBe('AUTHORIZATION_ERROR')
+    })
+
+    it('should require authentication', async () => {
+      await request(app)
+        .post('/api/surveys/templates')
+        .send({})
+        .expect(401)
+    })
+  })
+
+  describe('GET /api/surveys/instances/:id', () => {
+    it('should enforce tenant isolation', async () => {
+      const otherTenantToken = generateAuthToken({
+        userId: 'user-3',
+        tenantId: 'tenant-2',
+        roles: ['service_coordinator']
+      })
+
+      await request(app)
+        .get('/api/surveys/instances/instance-from-tenant-1')
+        .set('Authorization', `Bearer ${otherTenantToken}`)
+        .expect(404) // Should not find instance from different tenant
+    })
+  })
+})
+```
+
+#### Database Integration Testing
+```typescript
+// Database integration testing
+import { db } from '@/config/database'
+import { SurveyRepository } from '@/repositories/SurveyRepository'
+
+describe('SurveyRepository Integration', () => {
+  let repository: SurveyRepository
+
+  beforeAll(async () => {
+    await db.migrate.latest()
+  })
+
+  beforeEach(async () => {
+    await db.seed.run()
+    repository = new SurveyRepository(db)
+  })
+
+  afterEach(async () => {
+    await db('survey_instances').del()
+    await db('survey_templates').del()
+  })
+
+  afterAll(async () => {
+    await db.destroy()
+  })
+
+  it('should enforce tenant isolation at database level', async () => {
+    const template1 = await repository.createTemplate({
+      name: 'Survey 1',
+      tenantId: 'tenant-1',
+      type: 'initial_assessment'
+    })
+
+    const template2 = await repository.createTemplate({
+      name: 'Survey 2', 
+      tenantId: 'tenant-2',
+      type: 'initial_assessment'
+    })
+
+    const tenant1Templates = await repository.findTemplatesByTenant('tenant-1')
+    
+    expect(tenant1Templates).toHaveLength(1)
+    expect(tenant1Templates[0].id).toBe(template1.id)
+    expect(tenant1Templates[0].name).toBe('Survey 1')
+  })
+
+  it('should maintain referential integrity', async () => {
+    // Attempt to create instance with non-existent template
+    await expect(
+      repository.createInstance({
+        templateId: 'non-existent',
+        tenantId: 'tenant-1',
+        memberId: 'member-1'
+      })
+    ).rejects.toThrow()
+  })
+})
+```
+
+### Performance and Load Testing
+
+#### Load Testing Strategy with k6
+```typescript
+// Performance testing script
+import http from 'k6/http'
+import { check, sleep } from 'k6'
+
+export let options = {
+  stages: [
+    { duration: '2m', target: 100 },  // Ramp up to 100 users
+    { duration: '5m', target: 100 },  // Stay at 100 users
+    { duration: '2m', target: 200 },  // Ramp up to 200 users
+    { duration: '5m', target: 200 },  // Stay at 200 users
+    { duration: '2m', target: 0 },    // Ramp down
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500'],    // 95% of requests under 500ms
+    http_req_failed: ['rate<0.1'],       // Error rate under 10%
+    http_reqs: ['rate>100'],             // Request rate over 100 RPS
+  }
+}
+
+export default function() {
+  // Test survey template listing
+  let response = http.get('http://localhost:3001/api/surveys/templates', {
+    headers: { Authorization: 'Bearer test-token' }
+  })
+  
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
+    'has templates': (r) => JSON.parse(r.body).data.length > 0,
+  })
+
+  sleep(1)
+
+  // Test survey instance creation
+  response = http.post('http://localhost:3001/api/surveys/instances', 
+    JSON.stringify({
+      templateId: 'template-1',
+      memberId: 'member-1'
+    }), {
+      headers: { 
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token' 
+      }
+    }
+  )
+
+  check(response, {
+    'instance created': (r) => r.status === 201,
+    'response time < 1000ms': (r) => r.timings.duration < 1000,
+  })
+
+  sleep(1)
+}
+```
+
+### Test Data Management and Factories
+
+#### Test Data Factories
+```typescript
+// Test data factories for consistent test data
+export const createMockSurveyTemplate = (overrides = {}) => ({
+  id: 'template-1',
+  name: 'Mock Survey',
+  tenantId: 'tenant-1',
+  type: 'initial_assessment',
+  version: 1,
+  isActive: true,
+  questions: [
+    {
+      id: 'q1',
+      type: 'text_input',
+      text: 'Sample question',
+      required: true
+    }
+  ],
+  businessRules: [],
+  workflow: { approvalRequired: true },
+  createdAt: new Date(),
+  ...overrides
+})
+
+export const createMockUser = (overrides = {}) => ({
+  id: 'user-1',
+  email: 'test@example.com',
+  tenantId: 'tenant-1',
+  firstName: 'Test',
+  lastName: 'User',
+  roles: ['service_coordinator'],
+  isActive: true,
+  ...overrides
+})
+
+export const createMockSurveyInstance = (overrides = {}) => ({
+  id: 'instance-1',
+  templateId: 'template-1',
+  tenantId: 'tenant-1',
+  memberId: 'member-1',
+  status: 'draft',
+  responseData: {},
+  assignedTo: 'user-1',
+  createdAt: new Date(),
+  ...overrides
+})
+```
+
+#### Mock Service Workers (MSW) Setup
+```typescript
+// MSW handlers for API mocking
+import { rest } from 'msw'
+import { createMockSurveyTemplate, createMockSurveyInstance } from './factories'
+
+export const handlers = [
+  // Survey template endpoints
+  rest.get('/api/surveys/templates', (req, res, ctx) => {
+    return res(
+      ctx.json({
+        success: true,
+        data: [createMockSurveyTemplate()]
+      })
+    )
+  }),
+
+  rest.post('/api/surveys/templates', (req, res, ctx) => {
+    const template = req.body as any
+    return res(
+      ctx.json({
+        success: true,
+        data: createMockSurveyTemplate(template)
+      })
+    )
+  }),
+
+  // Survey instance endpoints
+  rest.post('/api/surveys/instances', (req, res, ctx) => {
+    const instance = req.body as any
+    return res(
+      ctx.json({
+        success: true,
+        data: createMockSurveyInstance(instance)
+      })
+    )
+  }),
+
+  // Member search endpoint
+  rest.get('/api/members/search', (req, res, ctx) => {
+    const query = req.url.searchParams.get('q')
+    return res(
+      ctx.json({
+        success: true,
+        data: [
+          {
+            id: 'member-1',
+            firstName: 'John',
+            lastName: 'Doe',
+            memberId: 'M001',
+            planType: 'LTSS'
+          }
+        ]
+      })
+    )
+  })
+]
+```
+
+This comprehensive design document now includes all required sections with detailed error handling strategies, testing approaches, and implementation patterns that address all 14 requirements from the requirements document. The design emphasizes modern development practices, HIPAA compliance, scalability, and maintainability while providing clear guidance for implementation.
+
+### Key Design Decisions and Rationales
+
+#### 1. Modern Frontend Architecture Choice
+**Decision**: Use Next.js 15 with App Router, shadcn/ui, and TanStack ecosystem
+**Rationale**: 
+- Next.js 15 provides excellent performance with server components and modern React patterns
+- shadcn/ui ensures consistent, accessible UI components with modern design system
+- TanStack ecosystem (Query, Form, Table, Router) provides type-safe, performant data management
+- This stack addresses Requirements 1, 5, 6, 13 for dynamic interfaces and performance
+
+#### 2. Multi-Tenant Data Architecture
+**Decision**: Row-level security with tenant isolation at database level
+**Rationale**:
+- Ensures complete data separation between healthcare organizations (Requirement 3.4)
+- Simplifies application logic while maintaining security
+- Supports HIPAA compliance requirements (Requirement 12.4)
+- Enables efficient cross-tenant reporting when needed (Requirement 14.1)
+
+#### 3. Dynamic Survey Engine Design
+**Decision**: EAV (Entity-Attribute-Value) model with JSONB for flexible question storage
+**Rationale**:
+- Supports unlimited question types and configurations (Requirement 1.1, 1.2)
+- Enables conditional logic without schema changes (Requirement 1.2)
+- Maintains performance with proper indexing (Requirement 13.1)
+- Allows for complex business rules and validation (Requirement 9.2)
+
+#### 4. Comprehensive Error Handling Strategy
+**Decision**: Structured error boundaries, centralized API error handling, and detailed logging
+**Rationale**:
+- Ensures graceful degradation for healthcare-critical applications
+- Provides detailed audit trails for HIPAA compliance (Requirement 12.5)
+- Enables effective debugging and monitoring (Requirement 8.4)
+- Improves user experience with meaningful error messages
+
+#### 5. Testing Strategy Design
+**Decision**: Multi-layered testing with unit, integration, E2E, and performance tests
+**Rationale**:
+- Healthcare applications require high reliability and quality assurance
+- Comprehensive testing ensures all 14 requirements are properly validated
+- Performance testing validates scalability requirements (Requirement 13.2)
+- E2E testing ensures complete user workflows function correctly
+
+This design provides a solid foundation for implementing the CHC Insight CRM system with modern development practices, comprehensive error handling, robust testing strategies, and full compliance with healthcare industry requirements.
