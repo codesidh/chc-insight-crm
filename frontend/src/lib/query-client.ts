@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query'
+import { QueryClient, MutationCache } from '@tanstack/react-query'
 
 // Default query options for consistent behavior across the app
 const defaultQueryOptions = {
@@ -57,9 +57,9 @@ const handleQueryError = (error: any) => {
 export const queryClient = new QueryClient({
   defaultOptions: defaultQueryOptions,
   // Global error handler
-  mutationCache: {
+  mutationCache: new MutationCache({
     onError: handleQueryError,
-  } as any,
+  }),
 })
 
 // Query keys factory for consistent key management
