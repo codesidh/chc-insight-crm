@@ -89,7 +89,7 @@ Both frontend and backend use consistent path aliases:
     - Zustand (optional) - Global client state if needed (filters, UI preferences)
 **CRITICAL: ALWAYS check shadcn/ui registry first using MCP tools before suggesting any UI components.**
 **PROCESS: 1) Search registry 2) View component details 3) Get examples 4) Only then implement**
-- References: 
+**References:**
     - Dashboard: npx shadcn@latest add dashboard-01
     - Login: npx shadcn@latest add login-01
     - Signup: npx shadcn@latest add signup-01
@@ -106,6 +106,9 @@ Both frontend and backend use consistent path aliases:
         -- Radar: https://ui.shadcn.com/charts/radar#charts
         -- Radial: https://ui.shadcn.com/charts/radial#charts
         -- Tooltips: https://ui.shadcn.com/charts/tooltip#charts
+    - github code reference: https://github.com/shadcn-ui/ui  
+    - Survey form builder code reference: https://github.com/strlrd-29/shadcn-ui-form-builder
+
 
 **Never create custom UI components when shadcn equivalents exist.**
 **Remove unused import**
@@ -118,6 +121,7 @@ Both frontend and backend use consistent path aliases:
 3. Use `mcp_shadcn_get_item_examples_from_registries` to get usage examples
 4. Use `mcp_shadcn_get_add_command_for_items` to get install commands
 5. Only if NO shadcn component exists, create custom component
+6. Run typescript validations and build to eliminate errors.
 
 **VIOLATION CONSEQUENCES:**
 - If Kiro suggests custom components without checking registry first, user should remind: "Check shadcn registry first"
