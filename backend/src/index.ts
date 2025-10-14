@@ -6,6 +6,8 @@ import config from '@/config/environment';
 import { errorHandler } from '@/middleware/errorHandler';
 import { requestLogger } from '@/middleware/requestLogger';
 import { DatabaseService } from '@/services/database.service';
+import { createAuthRoutes } from '@/routes/auth.routes';
+import { createAuthMiddleware } from '@/middleware/auth.middleware';
 
 const app = express();
 
@@ -83,13 +85,27 @@ app.get('/health', async (_req, res) => {
   }
 });
 
-// API routes will be added in future tasks
+// Initialize routes after database is available
+let authRoutes: express.Router;
+
+// API routes
 app.get('/api', (_req, res) => {
   res.json({
     message: 'CHC Insight CRM API',
     version: '1.0.0',
     documentation: '/api/docs',
   });
+});
+
+// Authentication routes (will be initialized after database connection)
+app.use('/api/auth', (req, res, next) => {
+  if (!authRoutes) {
+    return res.status(503).json({
+      error: 'Service Unavailable',
+      message: 'Authentication service is initializing'
+    });
+  }
+  authRoutes(req, res, next);
 });
 
 // 404 handler
@@ -111,6 +127,10 @@ async function startServer() {
   try {
     // Initialize database connections
     await DatabaseService.initialize();
+
+    // Initialize routes with database connection
+    const db = DatabaseService.getKnexInstance();
+    authRoutes = createAuthRoutes(db);
 
     // Start the server
     const server = app.listen(port, () => {

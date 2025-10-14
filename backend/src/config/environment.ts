@@ -39,6 +39,7 @@ export interface EnvironmentConfig {
   };
   jwt: {
     secret: string;
+    refreshSecret: string;
     expiresIn: string;
     refreshExpiresIn: string;
   };
@@ -96,6 +97,7 @@ const config: EnvironmentConfig = {
   },
   jwt: {
     secret: process.env['JWT_SECRET'] || 'default-jwt-secret-change-this',
+    refreshSecret: process.env['JWT_REFRESH_SECRET'] || 'default-jwt-refresh-secret-change-this',
     expiresIn: process.env['JWT_EXPIRES_IN'] || '24h',
     refreshExpiresIn: process.env['JWT_REFRESH_EXPIRES_IN'] || '7d',
   },
@@ -139,6 +141,7 @@ if (nodeEnv === 'production') {
     'DATABASE_USERNAME',
     'DATABASE_PASSWORD',
     'JWT_SECRET',
+    'JWT_REFRESH_SECRET',
     'REDIS_HOST',
   ];
 
@@ -153,6 +156,10 @@ if (nodeEnv === 'production') {
   // Validate JWT secret strength in production
   if (config.jwt.secret.length < 32) {
     throw new Error('JWT_SECRET must be at least 32 characters long in production');
+  }
+  
+  if (config.jwt.refreshSecret.length < 32) {
+    throw new Error('JWT_REFRESH_SECRET must be at least 32 characters long in production');
   }
 }
 
