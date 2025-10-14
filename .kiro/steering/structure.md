@@ -4,38 +4,14 @@
 
 ```
 chc-insight-crm/
-├── frontend/                 # Next.js application
+├── frontend/                 # Next.js application (see frontend-standards.md)
 ├── backend/                  # Express.js API
 ├── .kiro/                    # Kiro specifications and steering
 ├── node_modules/             # Root dependencies
 └── package.json              # Workspace configuration
 ```
 
-## Frontend Structure (`frontend/`)
-
-```
-frontend/
-├── src/
-│   ├── app/                  # Next.js 14 App Router
-│   │   ├── layout.tsx        # Root layout
-│   │   ├── page.tsx          # Home page
-│   │   ├── globals.css       # Global styles
-│   │   └── (routes)/         # Route groups
-│   ├── components/           # React components
-│   │   ├── ui/               # shadcn/ui components
-│   │   └── custom/           # Custom components
-│   ├── lib/                  # Utilities and configurations
-│   │   ├── utils.ts          # Utility functions
-│   │   └── config.ts         # App configuration
-│   ├── hooks/                # Custom React hooks
-│   ├── types/                # TypeScript definitions
-│   └── providers/            # Context providers
-├── public/                   # Static assets
-├── components.json           # shadcn/ui configuration
-├── next.config.ts            # Next.js configuration
-├── tailwind.config.js        # Tailwind CSS configuration
-└── tsconfig.json             # TypeScript configuration
-```
+**Note**: Frontend structure is detailed in `frontend-standards.md`
 
 ## Backend Structure (`backend/`)
 
@@ -60,37 +36,19 @@ backend/
 └── tsconfig.json             # TypeScript configuration
 ```
 
-## Naming Conventions
+## Backend Naming Conventions
 
 ### Files and Directories
 - **kebab-case** for directories: `user-management/`
-- **PascalCase** for React components: `UserProfile.tsx`
 - **camelCase** for utilities and services: `userService.ts`
-- **lowercase** for configuration files: `next.config.ts`
+- **lowercase** for configuration files: `knexfile.ts`
 
 ### Code Conventions
-- **PascalCase** for React components and TypeScript interfaces
+- **PascalCase** for TypeScript interfaces and classes
 - **camelCase** for functions, variables, and methods
 - **SCREAMING_SNAKE_CASE** for constants and environment variables
-- **kebab-case** for CSS classes and HTML attributes
 
-## Import Organization
-
-1. External libraries (React, Next.js, etc.)
-2. Internal utilities and configurations (`@/lib`, `@/config`)
-3. Components (`@/components`)
-4. Types (`@/types`)
-5. Relative imports (`./`, `../`)
-
-## Component Structure
-
-### Frontend Components
-- Place reusable UI components in `components/ui/`
-- Place business logic components in `components/custom/`
-- Use shadcn/ui patterns for consistent styling
-- Export components as named exports
-
-### Backend Structure
+## Backend Structure
 - Controllers handle HTTP requests/responses only
 - Services contain business logic
 - Models define data structures and database interactions

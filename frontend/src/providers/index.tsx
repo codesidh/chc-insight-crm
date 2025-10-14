@@ -1,7 +1,7 @@
 'use client'
 
 import { QueryProvider } from './query-provider'
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider } from './theme-provider'
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -9,12 +9,7 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <ThemeProvider>
       <QueryProvider>
         {children}
       </QueryProvider>

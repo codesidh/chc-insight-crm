@@ -315,7 +315,7 @@ export default function ExamplesPage() {
               <div className="space-y-2">
                 <h4 className="font-medium">🎨 Design System</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Modern oklch color system</li>
+                  <li>• Clean HSL color system</li>
                   <li>• Consistent typography scale</li>
                   <li>• Responsive design patterns</li>
                   <li>• Dark/light theme support</li>
