@@ -1,107 +1,89 @@
-/**
- * Member and Provider Lookup Routes
- * 
- * Defines API routes for member and provider data management:
- * - Member and provider search with type-ahead
- * - Data pre-population for form instances
- * - Mock data generation for development and testing
- * - Staging data management
- * 
- * Requirements: 2.1, 2.2, 2.3
- */
-
 import { Router } from 'express';
 import { MemberProviderLookupController } from '../controllers/member-provider-lookup.controller';
+import { MemberProviderLookupService } from '../services/member-provider-lookup.service';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { DatabaseService } from '../services/database.service';
 
 const router = Router();
-const memberProviderController = new MemberProviderLookupController();
+
+// Initialize services and controller
+const databaseService = DatabaseService.getInstance();
+const lookupService = new MemberProviderLookupService(databaseService.getConnection());
+const lookupController = new MemberProviderLookupController(lookupService);
 
 // Apply authentication middleware to all routes
 router.use(authMiddleware);
 
-// ============================================================================
-// MEMBER ROUTES
-// ============================================================================
+/**
+ * @route GET /api/lookup/quick-search
+ * @desc Quick search for both members and providers
+ * @access Private
+ * @query {string} query - Search query for both members and providers
+ * @query {string} [memberQuery] - Specific search query for members
+ * @query {string} [providerQuery] - Specific search query for providers
+ * @query {string} [memberZone] - Filter members by zone (SW, SE, NE, NW, LC)
+ * @query {string} [providerNetworkStatus] - Filter providers by network status
+ * @query {string} [providerSpecialty] - Filter providers by specialty
+ * @query {number} [limit=10] - Maximum number of results per category
+ */
+router.get('/quick-search', lookupController.quickSearch);
 
 /**
- * Member Management Routes
- * Base path: /api/members
+ * @route GET /api/lookup/members/quick-search
+ * @desc Quick search members only
+ * @access Private
+ * @query {string} query - Search query (name, Medicaid ID, HCIN ID)
+ * @query {string} [memberZone] - Filter by member zone (SW, SE, NE, NW, LC)
+ * @query {number} [limit=10] - Maximum number of results
  */
-
-// GET /api/members/search - Search members with type-ahead
-router.get('/members/search', memberProviderController.searchMembers);
-
-// GET /api/members/:memberId - Get member by ID
-router.get('/members/:memberId', memberProviderController.getMemberById);
-
-// POST /api/members - Create or update member data
-router.post('/members', memberProviderController.upsertMemberData);
-
-// POST /api/members/bulk-import - Bulk import member data
-router.post('/members/bulk-import', memberProviderController.bulkImportMembers);
-
-// ============================================================================
-// PROVIDER ROUTES
-// ============================================================================
+router.get('/members/quick-search', lookupController.quickSearchMembers);
 
 /**
- * Provider Management Routes
- * Base path: /api/providers
+ * @route GET /api/lookup/providers/quick-search
+ * @desc Quick search providers only
+ * @access Private
+ * @query {string} query - Search query (name, NPI, specialty)
+ * @query {string} [networkStatus] - Filter by network status (defaults to in_network)
+ * @query {string} [specialty] - Filter by specialty
+ * @query {number} [limit=10] - Maximum number of results
  */
-
-// GET /api/providers/search - Search providers with type-ahead
-router.get('/providers/search', memberProviderController.searchProviders);
-
-// GET /api/providers/:providerId - Get provider by ID
-router.get('/providers/:providerId', memberProviderController.getProviderById);
-
-// POST /api/providers - Create or update provider data
-router.post('/providers', memberProviderController.upsertProviderData);
-
-// POST /api/providers/bulk-import - Bulk import provider data
-router.post('/providers/bulk-import', memberProviderController.bulkImportProviders);
-
-// ============================================================================
-// DATA PRE-POPULATION ROUTES
-// ============================================================================
+router.get('/providers/quick-search', lookupController.quickSearchProviders);
 
 /**
- * Pre-population Routes
- * Base path: /api/pre-population
+ * @route GET /api/lookup/member-provider/:memberDataId/:providerId
+ * @desc Get member and provider data for form pre-population
+ * @access Private
+ * @param {string} memberDataId - Member data ID
+ * @param {string} providerId - Provider ID
  */
-
-// GET /api/pre-population - Get pre-population data for form instances
-router.get('/pre-population', memberProviderController.getPrePopulationData);
-
-// ============================================================================
-// MOCK DATA GENERATION ROUTES
-// ============================================================================
+router.get('/member-provider/:memberDataId/:providerId', lookupController.getMemberAndProvider);
 
 /**
- * Mock Data Generation Routes (Development/Testing)
- * Base path: /api/mock-data
+ * @route GET /api/lookup/providers/by-member-zone/:memberZone
+ * @desc Get providers by member zone for targeted searches
+ * @access Private
+ * @param {string} memberZone - Member zone (SW, SE, NE, NW, LC)
+ * @query {string} [specialty] - Filter by provider specialty
+ * @query {number} [limit=20] - Maximum number of results
  */
-
-// POST /api/mock-data/members - Generate mock member data
-router.post('/mock-data/members', memberProviderController.generateMockMembers);
-
-// POST /api/mock-data/providers - Generate mock provider data
-router.post('/mock-data/providers', memberProviderController.generateMockProviders);
-
-// ============================================================================
-// STAGING DATA UTILITY ROUTES
-// ============================================================================
+router.get('/providers/by-member-zone/:memberZone', lookupController.getProvidersByMemberZone);
 
 /**
- * Staging Data Utility Routes
- * Base path: /api/staging-data
+ * @route GET /api/lookup/members/by-service-coordinator/:assignedSCID
+ * @desc Get members by service coordinator for assignment workflows
+ * @access Private
+ * @param {string} assignedSCID - Service Coordinator ID
+ * @query {number} [limit=20] - Maximum number of results
  */
+router.get('/members/by-service-coordinator/:assignedSCID', lookupController.getMembersByServiceCoordinator);
 
-// GET /api/staging-data/stats - Get staging data statistics
-router.get('/staging-data/stats', memberProviderController.getStagingDataStats);
-
-// DELETE /api/staging-data/clear - Clear staging data (development/testing only)
-router.delete('/staging-data/clear', memberProviderController.clearStagingData);
+/**
+ * @route POST /api/lookup/validate-member-provider
+ * @desc Validate member and provider combination for form submissions
+ * @access Private
+ * @body {string} memberDataId - Member data ID
+ * @body {string} providerId - Provider ID
+ */
+router.post('/validate-member-provider', lookupController.validateMemberProviderCombination);
 
 export default router;

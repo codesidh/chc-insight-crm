@@ -1,123 +1,133 @@
-/**
- * Member and Provider Lookup Service
- * 
- * Handles member and provider data management including:
- * - Staging table operations for member and provider data
- * - Basic search functionality with type-ahead
- * - Data pre-population for form instances
- * - Mock data generation for development and testing
- * 
- * Requirements: 2.1, 2.2, 2.3
- */
-
 import { Knex } from 'knex';
-import { v4 as uuidv4 } from 'uuid';
-import {
-  MemberData,
-  ProviderData,
-  ContactInfo,
-  Address,
-  ApiResponse,
-  PaginationParams
-} from '../types';
-import {
-  MemberDataSchema,
-  ProviderDataSchema,
-  MemberSearchSchema,
-  ProviderSearchSchema
-} from '../types/validation-schemas';
-import { DatabaseService } from './database.service';
+import { MemberData, ProviderData, ApiResponse } from '../types';
+import { MemberDataService } from './member-data.service';
+import { ProviderDataService } from './provider-data.service';
 
-export interface MemberSearchResult {
-  id: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
-  planType: string;
-  ltssType: string;
-  levelOfCare: string;
-  picsScore: number;
-  assignedCoordinator: string;
-  lastUpdated: Date;
+export interface QuickSearchResult {
+  members: MemberData[];
+  providers: ProviderData[];
 }
 
-export interface ProviderSearchResult {
-  id: string;
-  npi: string;
-  name: string;
-  specialty: string;
-  networkStatus: string;
-  contactInfo: ContactInfo;
-  lastUpdated: Date;
+export interface MemberProviderLookupFilters {
+  memberQuery?: string;
+  providerQuery?: string;
+  memberZone?: 'SW' | 'SE' | 'NE' | 'NW' | 'LC';
+  providerNetworkStatus?: 'in_network' | 'out_of_network' | 'pending' | 'terminated';
+  providerSpecialty?: string;
+  limit?: number;
 }
 
-export interface PrePopulationData {
-  memberData?: MemberData;
-  providerData?: ProviderData;
-  priorAssessments?: any[]; // Will be expanded in future iterations
-}
-
+/**
+ * Combined service for member and provider lookup operations
+ * Optimized for form pre-population and quick searches
+ */
 export class MemberProviderLookupService {
-  private db: Knex;
+  private memberDataService: MemberDataService;
+  private providerDataService: ProviderDataService;
 
-  constructor() {
-    this.db = DatabaseService.getInstance().getConnection();
+  constructor(private db: Knex) {
+    this.memberDataService = new MemberDataService(db);
+    this.providerDataService = new ProviderDataService(db);
   }
 
-  // ============================================================================
-  // MEMBER MANAGEMENT
-  // ============================================================================
-
   /**
-   * Search members with type-ahead functionality
+   * Quick search for both members and providers
+   * Used for form pre-population dropdowns
    */
-  async searchMembers(
+  async quickSearch(
     query: string,
-    tenantId: string,
-    limit: number = 10
-  ): Promise<ApiResponse<MemberSearchResult[]>> {
+    filters?: MemberProviderLookupFilters
+  ): Promise<ApiResponse<QuickSearchResult>> {
     try {
-      // Validate input
-      const validatedInput = MemberSearchSchema.parse({ query, limit });
+      const limit = filters?.limit || 10;
 
-      // Build search query
-      const searchQuery = this.db('member_staging')
-        .where('tenant_id', tenantId)
-        .where(function () {
-          this.where('first_name', 'ilike', `%${validatedInput.query}%`)
-            .orWhere('last_name', 'ilike', `%${validatedInput.query}%`)
-            .orWhere('member_id', 'ilike', `%${validatedInput.query}%`)
-            .orWhereRaw("CONCAT(first_name, ' ', last_name) ilike ?", [`%${validatedInput.query}%`]);
-        })
-        .orderByRaw("CASE WHEN first_name ilike ? THEN 1 WHEN last_name ilike ? THEN 2 ELSE 3 END",
-          [`${validatedInput.query}%`, `${validatedInput.query}%`])
-        .orderBy('last_name')
-        .orderBy('first_name')
-        .limit(validatedInput.limit);
+      // Search members
+      const memberPromise = this.quickSearchMembers(
+        filters?.memberQuery || query,
+        filters?.memberZone,
+        limit
+      );
 
-      const members = await searchQuery;
+      // Search providers
+      const providerPromise = this.quickSearchProviders(
+        filters?.providerQuery || query,
+        filters?.providerNetworkStatus,
+        filters?.providerSpecialty,
+        limit
+      );
 
-      const results: MemberSearchResult[] = members.map(member => ({
-        id: member.member_id,
-        firstName: member.first_name,
-        lastName: member.last_name,
-        dateOfBirth: member.date_of_birth,
-        planType: member.plan_type,
-        ltssType: member.ltss_type,
-        levelOfCare: member.level_of_care,
-        picsScore: member.pics_score,
-        assignedCoordinator: member.assigned_coordinator,
-        lastUpdated: member.last_updated
-      }));
+      const [memberResult, providerResult] = await Promise.all([
+        memberPromise,
+        providerPromise
+      ]);
+
+      if (!memberResult.success || !providerResult.success) {
+        return {
+          success: false,
+          error: {
+            code: 'SEARCH_ERROR',
+            message: 'Failed to perform quick search',
+            details: {
+              memberError: memberResult.error,
+              providerError: providerResult.error
+            }
+          }
+        };
+      }
 
       return {
         success: true,
-        data: results,
-        metadata: {
-          total: results.length,
-          limit: validatedInput.limit,
-          timestamp: new Date()
+        data: {
+          members: memberResult.data || [],
+          providers: providerResult.data || []
+        },
+        metadata: { timestamp: new Date() }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'SEARCH_ERROR',
+          message: 'Failed to perform quick search',
+          details: { error: error instanceof Error ? error.message : 'Unknown error' }
         }
+      };
+    }
+  }
+
+  /**
+   * Quick search members for form pre-population
+   */
+  async quickSearchMembers(
+    query: string,
+    memberZone?: 'SW' | 'SE' | 'NE' | 'NW' | 'LC',
+    limit: number = 10
+  ): Promise<ApiResponse<MemberData[]>> {
+    try {
+      let dbQuery = this.db('member_data')
+        .where(function() {
+          this.where('first_name', 'ilike', `%${query}%`)
+            .orWhere('last_name', 'ilike', `%${query}%`)
+            .orWhere('medicaid_id', 'ilike', `%${query}%`)
+            .orWhere('hcin_id', 'ilike', `%${query}%`);
+        });
+
+      if (memberZone) {
+        dbQuery = dbQuery.where('member_zone', memberZone);
+      }
+
+      const members = await dbQuery
+        .select('*')
+        .orderBy('last_name', 'asc')
+        .orderBy('first_name', 'asc')
+        .limit(limit);
+
+      const memberData = members.map(member => this.mapDbToMemberData(member));
+
+      return {
+        success: true,
+        data: memberData,
+        metadata: { timestamp: new Date() }
       };
     } catch (error) {
       return {
@@ -132,207 +142,44 @@ export class MemberProviderLookupService {
   }
 
   /**
-   * Get member by ID
+   * Quick search providers for form pre-population
    */
-  async getMemberById(memberId: string, tenantId: string): Promise<ApiResponse<MemberData>> {
-    try {
-      const member = await this.db('member_staging')
-        .where({ member_id: memberId, tenant_id: tenantId })
-        .first();
-
-      if (!member) {
-        return {
-          success: false,
-          error: {
-            code: 'MEMBER_NOT_FOUND',
-            message: 'Member not found'
-          }
-        };
-      }
-
-      const memberData: MemberData = {
-        id: member.member_id,
-        firstName: member.first_name,
-        lastName: member.last_name,
-        dateOfBirth: member.date_of_birth,
-        planType: member.plan_type,
-        ltssType: member.ltss_type,
-        levelOfCare: member.level_of_care,
-        picsScore: member.pics_score,
-        assignedCoordinator: member.assigned_coordinator,
-        contactInfo: member.contact_info || {}
-      };
-
-      return {
-        success: true,
-        data: memberData,
-        metadata: { timestamp: new Date() }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'MEMBER_FETCH_ERROR',
-          message: 'Failed to fetch member data',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
-    }
-  }
-
-  /**
-   * Create or update member data in staging table
-   */
-  async upsertMemberData(
-    memberData: MemberData,
-    tenantId: string
-  ): Promise<ApiResponse<MemberData>> {
-    try {
-      // Validate member data
-      const validatedData = MemberDataSchema.parse(memberData);
-
-      const memberRecord = {
-        member_id: validatedData.id,
-        tenant_id: tenantId,
-        first_name: validatedData.firstName,
-        last_name: validatedData.lastName,
-        date_of_birth: validatedData.dateOfBirth,
-        plan_type: validatedData.planType,
-        ltss_type: validatedData.ltssType,
-        level_of_care: validatedData.levelOfCare,
-        pics_score: validatedData.picsScore,
-        assigned_coordinator: validatedData.assignedCoordinator,
-        contact_info: JSON.stringify(validatedData.contactInfo),
-        last_updated: new Date()
-      };
-
-      // Use upsert (INSERT ... ON CONFLICT)
-      await this.db('member_staging')
-        .insert(memberRecord)
-        .onConflict(['member_id'])
-        .merge([
-          'first_name', 'last_name', 'date_of_birth', 'plan_type',
-          'ltss_type', 'level_of_care', 'pics_score', 'assigned_coordinator',
-          'contact_info', 'last_updated'
-        ]);
-
-      return {
-        success: true,
-        data: validatedData,
-        metadata: { timestamp: new Date() }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'MEMBER_UPSERT_ERROR',
-          message: 'Failed to upsert member data',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
-    }
-  }
-
-  /**
-   * Bulk import member data
-   */
-  async bulkImportMembers(
-    membersData: MemberData[],
-    tenantId: string
-  ): Promise<ApiResponse<{ imported: number; errors: string[] }>> {
-    try {
-      const errors: string[] = [];
-      let imported = 0;
-
-      // Process in batches to avoid memory issues
-      const batchSize = 100;
-      for (let i = 0; i < membersData.length; i += batchSize) {
-        const batch = membersData.slice(i, i + batchSize);
-
-        for (const memberData of batch) {
-          try {
-            const result = await this.upsertMemberData(memberData, tenantId);
-            if (result.success) {
-              imported++;
-            } else {
-              errors.push(`Member ${memberData.id}: ${result.error?.message}`);
-            }
-          } catch (error) {
-            errors.push(`Member ${memberData.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          }
-        }
-      }
-
-      return {
-        success: true,
-        data: { imported, errors },
-        metadata: {
-          total: membersData.length,
-          timestamp: new Date()
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'BULK_IMPORT_ERROR',
-          message: 'Failed to bulk import members',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
-    }
-  }
-
-  // ============================================================================
-  // PROVIDER MANAGEMENT
-  // ============================================================================
-
-  /**
-   * Search providers with type-ahead functionality
-   */
-  async searchProviders(
+  async quickSearchProviders(
     query: string,
-    tenantId: string,
+    networkStatus?: 'in_network' | 'out_of_network' | 'pending' | 'terminated',
+    specialty?: string,
     limit: number = 10
-  ): Promise<ApiResponse<ProviderSearchResult[]>> {
+  ): Promise<ApiResponse<ProviderData[]>> {
     try {
-      // Validate input
-      const validatedInput = ProviderSearchSchema.parse({ query, limit });
+      let dbQuery = this.db('provider_data')
+        .where(function() {
+          this.where('name', 'ilike', `%${query}%`)
+            .orWhere('npi', 'ilike', `%${query}%`)
+            .orWhere('specialty', 'ilike', `%${query}%`);
+        });
 
-      // Build search query
-      const searchQuery = this.db('provider_staging')
-        .where('tenant_id', tenantId)
-        .where(function () {
-          this.where('name', 'ilike', `%${validatedInput.query}%`)
-            .orWhere('npi', 'ilike', `%${validatedInput.query}%`)
-            .orWhere('provider_id', 'ilike', `%${validatedInput.query}%`)
-            .orWhere('specialty', 'ilike', `%${validatedInput.query}%`);
-        })
-        .orderByRaw("CASE WHEN name ilike ? THEN 1 WHEN npi ilike ? THEN 2 ELSE 3 END",
-          [`${validatedInput.query}%`, `${validatedInput.query}%`])
-        .orderBy('name')
-        .limit(validatedInput.limit);
+      if (networkStatus) {
+        dbQuery = dbQuery.where('network_status', networkStatus);
+      } else {
+        // Default to in-network providers for form pre-population
+        dbQuery = dbQuery.where('network_status', 'in_network');
+      }
 
-      const providers = await searchQuery;
+      if (specialty) {
+        dbQuery = dbQuery.where('specialty', 'ilike', `%${specialty}%`);
+      }
 
-      const results: ProviderSearchResult[] = providers.map(provider => ({
-        id: provider.provider_id,
-        npi: provider.npi,
-        name: provider.name,
-        specialty: provider.specialty,
-        networkStatus: provider.network_status,
-        contactInfo: provider.contact_info || {},
-        lastUpdated: provider.last_updated
-      }));
+      const providers = await dbQuery
+        .select('*')
+        .orderBy('name', 'asc')
+        .limit(limit);
+
+      const providerData = providers.map(provider => this.mapDbToProviderData(provider));
 
       return {
         success: true,
-        data: results,
-        metadata: {
-          total: results.length,
-          limit: validatedInput.limit,
-          timestamp: new Date()
-        }
+        data: providerData,
+        metadata: { timestamp: new Date() }
       };
     } catch (error) {
       return {
@@ -347,32 +194,77 @@ export class MemberProviderLookupService {
   }
 
   /**
-   * Get provider by ID
+   * Get member and provider data for form pre-population
+   * Used when both member and provider IDs are known
    */
-  async getProviderById(providerId: string, tenantId: string): Promise<ApiResponse<ProviderData>> {
+  async getMemberAndProvider(
+    memberDataId: string,
+    providerId: string
+  ): Promise<ApiResponse<{ member: MemberData; provider: ProviderData }>> {
     try {
-      const provider = await this.db('provider_staging')
-        .where({ provider_id: providerId, tenant_id: tenantId })
-        .first();
+      const [memberResult, providerResult] = await Promise.all([
+        this.memberDataService.getMemberById(memberDataId),
+        this.providerDataService.getProviderById(providerId)
+      ]);
 
-      if (!provider) {
+      if (!memberResult.success) {
         return {
           success: false,
-          error: {
-            code: 'PROVIDER_NOT_FOUND',
-            message: 'Provider not found'
-          }
+          error: memberResult.error!
         };
       }
 
-      const providerData: ProviderData = {
-        id: provider.provider_id,
-        npi: provider.npi,
-        name: provider.name,
-        specialty: provider.specialty,
-        networkStatus: provider.network_status,
-        contactInfo: provider.contact_info || {}
+      if (!providerResult.success) {
+        return {
+          success: false,
+          error: providerResult.error!
+        };
+      }
+
+      return {
+        success: true,
+        data: {
+          member: memberResult.data!,
+          provider: providerResult.data!
+        },
+        metadata: { timestamp: new Date() }
       };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          code: 'LOOKUP_ERROR',
+          message: 'Failed to get member and provider data',
+          details: { error: error instanceof Error ? error.message : 'Unknown error' }
+        }
+      };
+    }
+  }
+
+  /**
+   * Get providers by member zone for targeted searches
+   */
+  async getProvidersByMemberZone(
+    _memberZone: 'SW' | 'SE' | 'NE' | 'NW' | 'LC',
+    specialty?: string,
+    limit: number = 20
+  ): Promise<ApiResponse<ProviderData[]>> {
+    try {
+      // This is a simplified implementation
+      // In a real system, you might have geographic mapping between member zones and providers
+      let query = this.db('provider_data')
+        .where('network_status', 'in_network');
+
+      if (specialty) {
+        query = query.where('specialty', 'ilike', `%${specialty}%`);
+      }
+
+      const providers = await query
+        .select('*')
+        .orderBy('name', 'asc')
+        .limit(limit);
+
+      const providerData = providers.map(provider => this.mapDbToProviderData(provider));
 
       return {
         success: true,
@@ -383,8 +275,8 @@ export class MemberProviderLookupService {
       return {
         success: false,
         error: {
-          code: 'PROVIDER_FETCH_ERROR',
-          message: 'Failed to fetch provider data',
+          code: 'PROVIDER_SEARCH_ERROR',
+          message: 'Failed to get providers by member zone',
           details: { error: error instanceof Error ? error.message : 'Unknown error' }
         }
       };
@@ -392,232 +284,77 @@ export class MemberProviderLookupService {
   }
 
   /**
-   * Create or update provider data in staging table
+   * Get members by service coordinator for assignment workflows
    */
-  async upsertProviderData(
-    providerData: ProviderData,
-    tenantId: string
-  ): Promise<ApiResponse<ProviderData>> {
-    try {
-      // Validate provider data
-      const validatedData = ProviderDataSchema.parse(providerData);
-
-      const providerRecord = {
-        provider_id: validatedData.id,
-        tenant_id: tenantId,
-        npi: validatedData.npi,
-        name: validatedData.name,
-        specialty: validatedData.specialty,
-        network_status: validatedData.networkStatus,
-        contact_info: JSON.stringify(validatedData.contactInfo),
-        last_updated: new Date()
-      };
-
-      // Use upsert (INSERT ... ON CONFLICT)
-      await this.db('provider_staging')
-        .insert(providerRecord)
-        .onConflict(['provider_id'])
-        .merge([
-          'npi', 'name', 'specialty', 'network_status',
-          'contact_info', 'last_updated'
-        ]);
-
+  async getMembersByServiceCoordinator(
+    assignedSCID: string,
+    limit: number = 20
+  ): Promise<ApiResponse<MemberData[]>> {
+    const result = await this.memberDataService.getMembersByServiceCoordinator(assignedSCID, 1, limit);
+    
+    if (result.success) {
       return {
         success: true,
-        data: validatedData,
+        data: result.data!.members,
         metadata: { timestamp: new Date() }
       };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'PROVIDER_UPSERT_ERROR',
-          message: 'Failed to upsert provider data',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
     }
+    
+    return {
+      success: false,
+      error: result.error!
+    };
   }
 
   /**
-   * Bulk import provider data
+   * Validate member and provider combination for form submissions
    */
-  async bulkImportProviders(
-    providersData: ProviderData[],
-    tenantId: string
-  ): Promise<ApiResponse<{ imported: number; errors: string[] }>> {
+  async validateMemberProviderCombination(
+    memberDataId: string,
+    providerId: string
+  ): Promise<ApiResponse<{ valid: boolean; reason?: string }>> {
     try {
-      const errors: string[] = [];
-      let imported = 0;
+      const result = await this.getMemberAndProvider(memberDataId, providerId);
 
-      // Process in batches to avoid memory issues
-      const batchSize = 100;
-      for (let i = 0; i < providersData.length; i += batchSize) {
-        const batch = providersData.slice(i, i + batchSize);
-
-        for (const providerData of batch) {
-          try {
-            const result = await this.upsertProviderData(providerData, tenantId);
-            if (result.success) {
-              imported++;
-            } else {
-              errors.push(`Provider ${providerData.id}: ${result.error?.message}`);
-            }
-          } catch (error) {
-            errors.push(`Provider ${providerData.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          }
-        }
-      }
-
-      return {
-        success: true,
-        data: { imported, errors },
-        metadata: {
-          total: providersData.length,
-          timestamp: new Date()
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'BULK_IMPORT_ERROR',
-          message: 'Failed to bulk import providers',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
-    }
-  }
-
-  // ============================================================================
-  // DATA PRE-POPULATION
-  // ============================================================================
-
-  /**
-   * Get pre-population data for form instances
-   */
-  async getPrePopulationData(
-    memberId?: string,
-    providerId?: string,
-    tenantId?: string
-  ): Promise<ApiResponse<PrePopulationData>> {
-    try {
-      if (!tenantId) {
+      if (!result.success) {
         return {
-          success: false,
-          error: {
-            code: 'TENANT_REQUIRED',
-            message: 'Tenant ID is required'
-          }
+          success: true,
+          data: {
+            valid: false,
+            reason: 'Member or provider not found'
+          },
+          metadata: { timestamp: new Date() }
         };
       }
 
-      const prePopData: PrePopulationData = {};
+      const { provider } = result.data!;
 
-      // Get member data if provided
-      if (memberId) {
-        const memberResult = await this.getMemberById(memberId, tenantId);
-        if (memberResult.success) {
-          prePopData.memberData = memberResult.data;
-        }
+      // Basic validation rules
+      if (provider.networkStatus !== 'in_network') {
+        return {
+          success: true,
+          data: {
+            valid: false,
+            reason: 'Provider is not in network'
+          },
+          metadata: { timestamp: new Date() }
+        };
       }
 
-      // Get provider data if provided
-      if (providerId) {
-        const providerResult = await this.getProviderById(providerId, tenantId);
-        if (providerResult.success) {
-          prePopData.providerData = providerResult.data;
-        }
-      }
-
-      // TODO: Get prior assessments (will be implemented in future iterations)
-      prePopData.priorAssessments = [];
+      // Additional validation logic can be added here
+      // For example, checking if provider specialty matches member needs
 
       return {
         success: true,
-        data: prePopData,
+        data: { valid: true },
         metadata: { timestamp: new Date() }
       };
     } catch (error) {
       return {
         success: false,
         error: {
-          code: 'PREPOPULATION_ERROR',
-          message: 'Failed to get pre-population data',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
-    }
-  }
-
-  // ============================================================================
-  // MOCK DATA GENERATION
-  // ============================================================================
-
-  /**
-   * Generate mock member data for development and testing
-   */
-  async generateMockMembers(count: number, tenantId: string): Promise<ApiResponse<MemberData[]>> {
-    try {
-      const mockMembers: MemberData[] = [];
-      const firstNames = ['John', 'Jane', 'Michael', 'Sarah', 'David', 'Lisa', 'Robert', 'Emily', 'James', 'Ashley'];
-      const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
-      const planTypes = ['Medicaid', 'Medicare', 'Dual Eligible', 'Commercial'];
-      const ltssTypes = ['Home Care', 'Adult Day Care', 'Assisted Living', 'Nursing Home'];
-      const levelsOfCare = ['Low', 'Medium', 'High', 'Critical'];
-      const coordinators = ['Alice Johnson', 'Bob Smith', 'Carol Davis', 'David Wilson', 'Eva Brown'];
-
-      for (let i = 0; i < count; i++) {
-        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-
-        const mockMember: MemberData = {
-          id: `MBR${String(i + 1).padStart(6, '0')}`,
-          firstName,
-          lastName,
-          dateOfBirth: new Date(1940 + Math.floor(Math.random() * 60), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-          planType: planTypes[Math.floor(Math.random() * planTypes.length)],
-          ltssType: ltssTypes[Math.floor(Math.random() * ltssTypes.length)],
-          levelOfCare: levelsOfCare[Math.floor(Math.random() * levelsOfCare.length)],
-          picsScore: Math.floor(Math.random() * 100),
-          assignedCoordinator: coordinators[Math.floor(Math.random() * coordinators.length)],
-          contactInfo: {
-            phone: `(555) ${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-            email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@email.com`,
-            address: {
-              street1: `${Math.floor(Math.random() * 9999) + 1} Main St`,
-              city: 'Anytown',
-              state: 'NY',
-              zipCode: `${Math.floor(Math.random() * 90000) + 10000}`
-            }
-          }
-        };
-
-        mockMembers.push(mockMember);
-      }
-
-      // Insert mock data into staging table
-      const importResult = await this.bulkImportMembers(mockMembers, tenantId);
-
-      if (!importResult.success) {
-        return importResult;
-      }
-
-      return {
-        success: true,
-        data: mockMembers,
-        metadata: {
-          total: count,
-          imported: importResult.data?.imported || 0,
-          timestamp: new Date()
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'MOCK_GENERATION_ERROR',
-          message: 'Failed to generate mock member data',
+          code: 'VALIDATION_ERROR',
+          message: 'Failed to validate member-provider combination',
           details: { error: error instanceof Error ? error.message : 'Unknown error' }
         }
       };
@@ -625,146 +362,76 @@ export class MemberProviderLookupService {
   }
 
   /**
-   * Generate mock provider data for development and testing
+   * Map database row to MemberData interface
    */
-  async generateMockProviders(count: number, tenantId: string): Promise<ApiResponse<ProviderData[]>> {
-    try {
-      const mockProviders: ProviderData[] = [];
-      const providerNames = [
-        'City Medical Center', 'Regional Health System', 'Community Hospital', 'Family Care Clinic',
-        'Specialty Medical Group', 'Primary Care Associates', 'Advanced Healthcare', 'Metro Health Services',
-        'Comprehensive Care Center', 'Integrated Health Network'
-      ];
-      const specialties = [
-        'Primary Care', 'Cardiology', 'Neurology', 'Orthopedics', 'Psychiatry',
-        'Geriatrics', 'Internal Medicine', 'Family Medicine', 'Endocrinology', 'Pulmonology'
-      ];
-      const networkStatuses = ['in_network', 'out_of_network', 'pending'];
+  private mapDbToMemberData(dbRow: any): MemberData {
+    const memberData: MemberData = {
+      memberDataId: dbRow.member_data_id,
+      medicaidId: dbRow.medicaid_id,
+      hcinId: dbRow.hcin_id,
+      firstName: dbRow.first_name,
+      lastName: dbRow.last_name,
+      dateOfBirth: new Date(dbRow.date_of_birth),
+      planId: dbRow.plan_id,
+      planCategory: dbRow.plan_category,
+      planType: dbRow.plan_type,
+      planSubType: dbRow.plan_sub_type,
+      eligEffectiveDate: new Date(dbRow.elig_effective_date),
+      waiverCode: dbRow.waiver_code,
+      waiverEffectiveDate: new Date(dbRow.waiver_effective_date),
+      aligned: dbRow.aligned,
+      planDual: dbRow.plan_dual,
+      dsnpName: dbRow.dsnp_name,
+      memberZone: dbRow.member_zone,
+      picsScore: dbRow.pics_score,
+      assignedSCID: dbRow.assigned_scid,
+      scName: dbRow.sc_name,
+      scOrg: dbRow.sc_org,
+      scZone: dbRow.sc_zone,
+      scSupervisorName: dbRow.sc_supervisor_name,
+      scManagerName: dbRow.sc_manager_name,
+      scDirectorName: dbRow.sc_director_name,
+      lastUpdated: new Date(dbRow.last_updated)
+    };
 
-      for (let i = 0; i < count; i++) {
-        const name = providerNames[Math.floor(Math.random() * providerNames.length)];
-
-        const mockProvider: ProviderData = {
-          id: `PRV${String(i + 1).padStart(6, '0')}`,
-          npi: String(Math.floor(Math.random() * 9000000000) + 1000000000), // 10-digit NPI
-          name: `${name} ${i + 1}`,
-          specialty: specialties[Math.floor(Math.random() * specialties.length)],
-          networkStatus: networkStatuses[Math.floor(Math.random() * networkStatuses.length)],
-          contactInfo: {
-            phone: `(555) ${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-            email: `contact@${name.toLowerCase().replace(/\s+/g, '')}.com`,
-            address: {
-              street1: `${Math.floor(Math.random() * 9999) + 1} Medical Blvd`,
-              city: 'Healthcare City',
-              state: 'NY',
-              zipCode: `${Math.floor(Math.random() * 90000) + 10000}`
-            }
-          }
-        };
-
-        mockProviders.push(mockProvider);
-      }
-
-      // Insert mock data into staging table
-      const importResult = await this.bulkImportProviders(mockProviders, tenantId);
-
-      if (!importResult.success) {
-        return importResult;
-      }
-
-      return {
-        success: true,
-        data: mockProviders,
-        metadata: {
-          total: count,
-          imported: importResult.data?.imported || 0,
-          timestamp: new Date()
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'MOCK_GENERATION_ERROR',
-          message: 'Failed to generate mock provider data',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
+    // Handle optional fields
+    if (dbRow.elig_term_date) {
+      memberData.eligTermDate = new Date(dbRow.elig_term_date);
     }
-  }
-
-  // ============================================================================
-  // UTILITY METHODS
-  // ============================================================================
-
-  /**
-   * Get staging data statistics
-   */
-  async getStagingDataStats(tenantId: string): Promise<ApiResponse<{
-    memberCount: number;
-    providerCount: number;
-    lastMemberUpdate: Date | null;
-    lastProviderUpdate: Date | null;
-  }>> {
-    try {
-      const [memberStats, providerStats] = await Promise.all([
-        this.db('member_staging')
-          .where('tenant_id', tenantId)
-          .count('* as count')
-          .max('last_updated as last_update')
-          .first(),
-        this.db('provider_staging')
-          .where('tenant_id', tenantId)
-          .count('* as count')
-          .max('last_updated as last_update')
-          .first()
-      ]);
-
-      return {
-        success: true,
-        data: {
-          memberCount: parseInt(memberStats?.count as string) || 0,
-          providerCount: parseInt(providerStats?.count as string) || 0,
-          lastMemberUpdate: memberStats?.last_update || null,
-          lastProviderUpdate: providerStats?.last_update || null
-        },
-        metadata: { timestamp: new Date() }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'STATS_ERROR',
-          message: 'Failed to get staging data statistics',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
+    
+    if (dbRow.waiver_term_date) {
+      memberData.waiverTermDate = new Date(dbRow.waiver_term_date);
     }
+    
+    if (dbRow.contact_info) {
+      memberData.contactInfo = JSON.parse(dbRow.contact_info);
+    }
+
+    return memberData;
   }
 
   /**
-   * Clear staging data for a tenant (for testing purposes)
+   * Map database row to ProviderData interface
    */
-  async clearStagingData(tenantId: string): Promise<ApiResponse<void>> {
-    try {
-      await Promise.all([
-        this.db('member_staging').where('tenant_id', tenantId).del(),
-        this.db('provider_staging').where('tenant_id', tenantId).del()
-      ]);
-
-      return {
-        success: true,
-        metadata: { timestamp: new Date() }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          code: 'CLEAR_DATA_ERROR',
-          message: 'Failed to clear staging data',
-          details: { error: error instanceof Error ? error.message : 'Unknown error' }
-        }
-      };
-    }
+  private mapDbToProviderData(dbRow: any): ProviderData {
+    return {
+      id: dbRow.id,
+      name: dbRow.name,
+      npi: dbRow.npi,
+      taxonomy: dbRow.taxonomy,
+      providerEntity: dbRow.provider_entity,
+      providerType: dbRow.provider_type,
+      providerTypeCode: dbRow.provider_type_code,
+      organizationType: dbRow.organization_type,
+      specialty: dbRow.specialty,
+      specialtyCode: dbRow.specialty_code,
+      subSpecialty: dbRow.sub_specialty,
+      networkStatus: dbRow.network_status,
+      contactInfo: JSON.parse(dbRow.contact_info || '{}'),
+      relationshipSpecialistName: dbRow.relationship_specialist_name,
+      lastUpdated: new Date(dbRow.last_updated)
+    };
   }
 }
+
+export default MemberProviderLookupService;

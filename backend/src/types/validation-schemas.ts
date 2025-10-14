@@ -289,29 +289,72 @@ export const UserRoleAssignmentSchema = z.object({
 });
 
 // ============================================================================
-// DATA PRE-POPULATION SCHEMAS
+// DATA PRE-POPULATION AND MANAGEMENT SCHEMAS
 // ============================================================================
 
+export const ServiceCoordinatorSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
+  scid: z.string().min(1).max(50),
+  firstName: z.string().min(1).max(100),
+  lastName: z.string().min(1).max(100),
+  email: z.string().email().max(255),
+  phone: z.string().regex(/^\+?[\d\s\-\(\)\.]+$/).optional(),
+  organization: z.string().min(1).max(255),
+  zone: z.enum(['SW', 'SE', 'NE', 'NW', 'LC']),
+  supervisorId: z.string().uuid().optional(),
+  managerId: z.string().uuid().optional(),
+  directorId: z.string().uuid().optional(),
+  isActive: z.boolean().default(true),
+  maxCaseload: z.number().int().min(1).optional(),
+  currentCaseload: z.number().int().min(0).default(0),
+  specializations: z.array(z.string()).optional(),
+  licenseNumber: z.string().max(50).optional(),
+  hireDate: z.date(),
+  lastUpdated: z.date()
+});
+
 export const MemberDataSchema = z.object({
-  id: z.string().max(50),
+  memberDataId: z.string().max(50),
+  medicaidId: z.string().min(1).max(50),
+  hcinId: z.string().min(1).max(50),
   firstName: z.string().min(1).max(100),
   lastName: z.string().min(1).max(100),
   dateOfBirth: z.date(),
-  planType: z.string().max(100),
-  ltssType: z.string().max(100),
-  levelOfCare: z.string().max(100),
+  planId: z.string().min(1).max(50),
+  planCategory: z.enum(['Medical', 'RX', 'Vision']),
+  planType: z.enum(['NFCE', 'NFI']),
+  planSubType: z.enum(['HCBS', 'NF', 'NFI']),
+  eligEffectiveDate: z.date(),
+  eligTermDate: z.date().optional(),
+  waiverCode: z.enum(['20', '37', '38', '39']),
+  waiverEffectiveDate: z.date(),
+  waiverTermDate: z.date().optional(),
+  aligned: z.enum(['Y', 'N']),
+  planDual: z.enum(['Y', 'N']),
+  dsnpName: z.enum(['Amerihealth', 'Keystone First', 'Aetna', 'UPMC', 'PHW']),
+  memberZone: z.enum(['SW', 'SE', 'NE', 'NW', 'LC']),
   picsScore: z.number().min(0).max(100),
-  assignedCoordinator: z.string().max(255),
-  contactInfo: ContactInfoSchema
+  assignedSCID: z.string().min(1).max(50), // Foreign key reference
+  lastUpdated: z.date(),
+  contactInfo: ContactInfoSchema.optional(),
+  serviceCoordinator: ServiceCoordinatorSchema.optional() // Populated via join
 });
 
 export const ProviderDataSchema = z.object({
   id: z.string().max(50),
-  npi: z.string().length(10), // NPI is always 10 digits
   name: z.string().min(1).max(255),
-  specialty: z.string().max(255),
-  networkStatus: z.enum(['in_network', 'out_of_network', 'pending']),
-  contactInfo: ContactInfoSchema
+  npi: z.string().length(10), // NPI is always 10 digits
+  taxonomy: z.string().min(1).max(50),
+  providerEntity: z.string().min(1).max(255),
+  providerType: z.string().min(1).max(255),
+  providerTypeCode: z.string().min(1).max(50),
+  organizationType: z.string().min(1).max(255),
+  specialty: z.string().min(1).max(255),
+  specialtyCode: z.string().min(1).max(50),
+  subSpecialty: z.string().min(1).max(255),
+  networkStatus: z.enum(['in_network', 'out_of_network', 'pending', 'terminated']),
+  contactInfo: ContactInfoSchema,
+  relationshipSpecialistName: z.string().min(1).max(255),
+  lastUpdated: z.date()
 });
 
 // ============================================================================
@@ -451,6 +494,17 @@ export const UpdateUserSchema = CreateUserSchema.partial().extend({
   updatedBy: z.string().uuid()
 });
 
+export const CreateServiceCoordinatorSchema = ServiceCoordinatorSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  currentCaseload: true
+});
+
+export const UpdateServiceCoordinatorSchema = CreateServiceCoordinatorSchema.partial().extend({
+  updatedBy: z.string().uuid()
+});
+
 // ============================================================================
 // AUTHENTICATION SCHEMAS
 // ============================================================================
@@ -555,6 +609,7 @@ export {
   NotificationConfigSchema,
   
   // Data schemas
+  ServiceCoordinatorSchema,
   MemberDataSchema,
   ProviderDataSchema,
   
@@ -578,6 +633,8 @@ export {
   UpdateFormInstanceSchema,
   CreateUserSchema,
   UpdateUserSchema,
+  CreateServiceCoordinatorSchema,
+  UpdateServiceCoordinatorSchema,
   
   // Auth schemas
   LoginCredentialsSchema,

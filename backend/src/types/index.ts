@@ -334,7 +334,7 @@ export interface Permission {
 /**
  * User role assignment
  */
-export interface UserRole {
+export interface UserRoleAssignment {
   userId: string;
   roleId: string;
   assignedAt: Date;
@@ -342,35 +342,82 @@ export interface UserRole {
 }
 
 // ============================================================================
-// DATA PRE-POPULATION
+// DATA PRE-POPULATION AND MANAGEMENT
 // ============================================================================
 
 /**
- * Member data for pre-population
+ * Service Coordinator entity for care coordination management
  */
-export interface MemberData {
-  id: string;
+export interface ServiceCoordinator extends BaseEntity, AuditTrail {
+  scid: string; // Service Coordinator ID
   firstName: string;
   lastName: string;
-  dateOfBirth: Date;
-  planType: string;
-  ltssType: string;
-  levelOfCare: string;
-  picsScore: number;
-  assignedCoordinator: string;
-  contactInfo: ContactInfo;
+  email: string;
+  phone?: string;
+  organization: string;
+  zone: 'SW' | 'SE' | 'NE' | 'NW' | 'LC';
+  supervisorId?: string; // Reference to another ServiceCoordinator
+  managerId?: string; // Reference to another ServiceCoordinator
+  directorId?: string; // Reference to another ServiceCoordinator
+  isActive: boolean;
+  maxCaseload?: number;
+  currentCaseload: number;
+  specializations?: string[]; // e.g., ['HCBS', 'Behavioral Health', 'Geriatric']
+  licenseNumber?: string;
+  hireDate: Date;
+  lastUpdated: Date;
 }
 
 /**
- * Provider data for pre-population
+ * Enhanced Member data for pre-population and management
+ */
+export interface MemberData {
+  memberDataId: string;
+  medicaidId: string;
+  hcinId: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
+  planId: string;
+  planCategory: 'Medical' | 'RX' | 'Vision';
+  planType: 'NFCE' | 'NFI';
+  planSubType: 'HCBS' | 'NF' | 'NFI';
+  eligEffectiveDate: Date;
+  eligTermDate?: Date;
+  waiverCode: '20' | '37' | '38' | '39';
+  waiverEffectiveDate: Date;
+  waiverTermDate?: Date;
+  aligned: 'Y' | 'N';
+  planDual: 'Y' | 'N';
+  dsnpName: 'Amerihealth' | 'Keystone First' | 'Aetna' | 'UPMC' | 'PHW';
+  memberZone: 'SW' | 'SE' | 'NE' | 'NW' | 'LC';
+  picsScore: number;
+  assignedSCID: string; // Foreign key reference to ServiceCoordinator.scid
+  lastUpdated: Date;
+  contactInfo?: ContactInfo;
+  // Service Coordinator data will be populated via join/lookup
+  serviceCoordinator?: ServiceCoordinator;
+}
+
+/**
+ * Enhanced Provider data for pre-population and management
  */
 export interface ProviderData {
   id: string;
-  npi: string;
   name: string;
+  npi: string;
+  taxonomy: string;
+  providerEntity: string;
+  providerType: string;
+  providerTypeCode: string;
+  organizationType: string;
   specialty: string;
-  networkStatus: string;
+  specialtyCode: string;
+  subSpecialty: string;
+  networkStatus: 'in_network' | 'out_of_network' | 'pending' | 'terminated';
   contactInfo: ContactInfo;
+  relationshipSpecialistName: string;
+  lastUpdated: Date;
 }
 
 /**
