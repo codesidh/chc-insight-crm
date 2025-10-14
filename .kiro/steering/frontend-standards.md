@@ -205,6 +205,7 @@ import type { Survey } from '@/types'
 - **Charts**: https://ui.shadcn.com/charts
 - **GitHub Reference**: https://github.com/shadcn-ui/ui
 - **Survey Form Builder**: https://github.com/strlrd-29/shadcn-ui-form-builder
+- **Form Builder Reference**: https://github.com/hasanharman/form-builder.git (Primary reference for MVP implementation)
 
 ## Data Organization
 

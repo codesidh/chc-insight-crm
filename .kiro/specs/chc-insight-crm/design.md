@@ -2,7 +2,7 @@
 
 ## Overview
 
-CHC Insight is a comprehensive, multi-tenant CRM application designed for Long-Term Services and Supports (LTSS) business within Managed Care Organization (MCO) environments. The system captures survey/assessment data to meet state requirements while tracking member, provider, and internal performance metrics. Built on a modern three-tier architecture with React-based frontend, Node.js/Express backend, and PostgreSQL database, the system features a dynamic survey engine, workflow management, role-based access control, and comprehensive reporting capabilities to support healthcare compliance and quality management while handling high-volume operations and maintaining HIPAA compliance.
+CHC Insight is a comprehensive, multi-tenant CRM application designed for Long-Term Services and Supports (LTSS) business within Managed Care Organization (MCO) environments. The system captures case and assessment data through a hierarchical form management system (Categories → Types → Templates → Instances) to meet state requirements while tracking member, provider, and internal performance metrics. Built on a modern three-tier architecture with React-based frontend, Node.js/Express backend, and PostgreSQL database, the system features a dynamic form engine with taxonomical organization, workflow management, role-based access control, and comprehensive reporting capabilities to support healthcare compliance and quality management while handling high-volume operations and maintaining HIPAA compliance.
 
 ## Architecture
 
@@ -19,7 +19,7 @@ graph TB
         LB[Load Balancer]
         API[API Gateway]
         AUTH[Auth Service]
-        SURVEY[Survey Service]
+        FORM[Form Service]
         WORKFLOW[Workflow Service]
         REPORT[Reporting Service]
         NOTIFY[Notification Service]
@@ -42,13 +42,13 @@ graph TB
     MOBILE --> LB
     LB --> API
     API --> AUTH
-    API --> SURVEY
+    API --> FORM
     API --> WORKFLOW
     API --> REPORT
     API --> NOTIFY
     
-    SURVEY --> CACHE
-    SURVEY --> DB
+    FORM --> CACHE
+    FORM --> DB
     WORKFLOW --> DB
     REPORT --> DB
     AUTH --> CACHE
@@ -58,7 +58,7 @@ graph TB
     STAGING --> DB
     EXT --> STAGING
     
-    SURVEY --> FILES
+    FORM --> FILES
 ```
 
 ### Technology Stack
@@ -269,33 +269,67 @@ interface UserContext {
 }
 ```
 
-#### 2. Survey Service
+#### 2. Form Service
 ```typescript
-interface SurveyService {
-  createTemplate(template: SurveyTemplate): Promise<SurveyTemplate>
-  updateTemplate(id: string, template: Partial<SurveyTemplate>): Promise<SurveyTemplate>
-  getTemplate(id: string, version?: number): Promise<SurveyTemplate>
-  copyTemplate(id: string, newName: string): Promise<SurveyTemplate>
-  previewTemplate(template: SurveyTemplate): Promise<SurveyPreview>
-  createInstance(templateId: string, context: SurveyContext): Promise<SurveyInstance>
-  saveResponse(instanceId: string, responses: ResponseData[], isDraft?: boolean): Promise<SurveyInstance>
-  submitSurvey(instanceId: string): Promise<SurveyInstance>
+interface FormService {
+  // Form Category Management
+  getFormCategories(): Promise<FormCategory[]>
+  createFormCategory(category: FormCategory): Promise<FormCategory>
+  
+  // Form Type Management
+  getFormTypes(categoryId: string): Promise<FormType[]>
+  createFormType(categoryId: string, type: FormType): Promise<FormType>
+  
+  // Form Template Management
+  createTemplate(template: FormTemplate): Promise<FormTemplate>
+  updateTemplate(id: string, template: Partial<FormTemplate>): Promise<FormTemplate>
+  getTemplate(id: string, version?: number): Promise<FormTemplate>
+  copyTemplate(id: string, newName: string, targetTypeId?: string): Promise<FormTemplate>
+  previewTemplate(template: FormTemplate): Promise<FormPreview>
+  getTemplatesByType(typeId: string): Promise<FormTemplate[]>
+  
+  // Form Instance Management
+  createInstance(templateId: string, context: FormContext): Promise<FormInstance>
+  saveResponse(instanceId: string, responses: ResponseData[], isDraft?: boolean): Promise<FormInstance>
+  submitForm(instanceId: string): Promise<FormInstance>
   validateResponses(responses: ResponseData[]): Promise<ValidationResult>
   checkDuplicates(memberId: string, templateId: string): Promise<DuplicateCheckResult>
+  
+  // Data Services
   autoPopulateData(memberId: string, providerId?: string): Promise<PrePopulationData>
   searchMembers(query: string): Promise<Member[]>
   searchProviders(query: string): Promise<Provider[]>
 }
 
-interface SurveyTemplate {
+// Hierarchical Form Structure
+interface FormCategory {
   id: string
-  name: string
+  name: string // 'Cases' | 'Assessments'
   description?: string
-  type: SurveyType // initial_assessment, reassessment, provider_survey, incident_report, satisfaction_survey, custom
+  tenantId: string
+  isActive: boolean
+  createdAt: Date
+}
+
+interface FormType {
+  id: string
+  categoryId: string
+  name: string // 'BH Referrals', 'Health Risk (HDM)', etc.
+  description?: string
+  tenantId: string
+  businessRules: BusinessRule[]
+  isActive: boolean
+  createdAt: Date
+}
+
+interface FormTemplate {
+  id: string
+  typeId: string
+  name: string // 'BH Initial Referral v1.0'
+  description?: string
   version: number
   tenantId: string
   questions: Question[]
-  businessRules: BusinessRule[]
   workflow: WorkflowConfig
   isActive: boolean
   effectiveDate: Date
@@ -304,6 +338,23 @@ interface SurveyTemplate {
   dueDateCalculation?: DueDateRule
   reminderFrequency?: ReminderConfig
   autoAssignmentRules?: AssignmentRule[]
+}
+
+interface FormInstance {
+  id: string
+  templateId: string
+  tenantId: string
+  memberId?: string
+  providerId?: string
+  assignedTo?: string
+  status: FormStatus
+  responseData: ResponseData[]
+  contextData: any
+  dueDate?: Date
+  submittedAt?: Date
+  approvedAt?: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 interface Question {
@@ -319,13 +370,30 @@ interface Question {
   prePopulationMapping?: string // maps to staging table field
 }
 
-enum SurveyType {
-  INITIAL_ASSESSMENT = 'initial_assessment',
-  REASSESSMENT = 'reassessment',
-  PROVIDER_SURVEY = 'provider_survey',
-  INCIDENT_REPORT = 'incident_report',
-  SATISFACTION_SURVEY = 'satisfaction_survey',
-  CUSTOM = 'custom'
+enum FormCategoryType {
+  CASES = 'cases',
+  ASSESSMENTS = 'assessments'
+}
+
+enum CaseFormType {
+  BH_REFERRALS = 'bh_referrals',
+  APPEALS = 'appeals',
+  GRIEVANCES = 'grievances'
+}
+
+enum AssessmentFormType {
+  HEALTH_RISK_HDM = 'health_risk_hdm',
+  MEMBER_SATISFACTION = 'member_satisfaction',
+  PROVIDER_PERFORMANCE = 'provider_performance'
+}
+
+enum FormStatus {
+  DRAFT = 'draft',
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled'
 }
 
 interface PrePopulationData {
@@ -723,17 +791,41 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
 ### Core Entities
 
-#### Survey Template
+#### Hierarchical Form Structure
+
 ```sql
-CREATE TABLE survey_templates (
+-- Form Categories (Level 1: Cases, Assessments)
+CREATE TABLE form_categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id),
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL, -- 'Cases' or 'Assessments'
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Form Types (Level 2: BH Referrals, Appeals, Health Risk, etc.)
+CREATE TABLE form_types (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    category_id UUID NOT NULL REFERENCES form_categories(id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    name VARCHAR(255) NOT NULL, -- 'BH Referrals', 'Health Risk (HDM)', etc.
+    description TEXT,
+    business_rules JSONB,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Form Templates (Level 3: Versioned templates)
+CREATE TABLE form_templates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type_id UUID NOT NULL REFERENCES form_types(id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    name VARCHAR(255) NOT NULL, -- 'BH Initial Referral v1.0'
     description TEXT,
     version INTEGER NOT NULL DEFAULT 1,
     template_data JSONB NOT NULL,
     workflow_config JSONB,
-    business_rules JSONB,
     is_active BOOLEAN DEFAULT true,
     effective_date TIMESTAMP NOT NULL,
     expiration_date TIMESTAMP,
@@ -741,18 +833,16 @@ CREATE TABLE survey_templates (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-#### Survey Instance
-```sql
-CREATE TABLE survey_instances (
+-- Form Instances (Level 4: Actual executions)
+CREATE TABLE form_instances (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    template_id UUID NOT NULL REFERENCES survey_templates(id),
+    template_id UUID NOT NULL REFERENCES form_templates(id),
     tenant_id UUID NOT NULL REFERENCES tenants(id),
     member_id VARCHAR(50),
     provider_id VARCHAR(50),
     assigned_to UUID REFERENCES users(id),
-    status survey_status NOT NULL DEFAULT 'draft',
+    status form_status NOT NULL DEFAULT 'draft',
     response_data JSONB,
     context_data JSONB,
     due_date TIMESTAMP,
@@ -761,13 +851,16 @@ CREATE TABLE survey_instances (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create enum for form status
+CREATE TYPE form_status AS ENUM ('draft', 'pending', 'approved', 'rejected', 'completed', 'cancelled');
 ```
 
 #### Workflow Instance
 ```sql
 CREATE TABLE workflow_instances (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    survey_id UUID NOT NULL REFERENCES survey_instances(id),
+    form_instance_id UUID NOT NULL REFERENCES form_instances(id),
     workflow_type VARCHAR(100) NOT NULL,
     current_state VARCHAR(100) NOT NULL,
     state_data JSONB,
