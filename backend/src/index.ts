@@ -8,6 +8,9 @@ import { requestLogger } from '@/middleware/requestLogger';
 import { DatabaseService } from '@/services/database.service';
 import { createAuthRoutes } from '@/routes/auth.routes';
 import { createAuthMiddleware } from '@/middleware/auth.middleware';
+import formHierarchyRoutes from '@/routes/form-hierarchy.routes';
+import formBuilderRoutes from '@/routes/form-builder.routes';
+import memberProviderRoutes from '@/routes/member-provider-lookup.routes';
 
 const app = express();
 
@@ -107,6 +110,15 @@ app.use('/api/auth', (req, res, next) => {
   }
   authRoutes(req, res, next);
 });
+
+// Form hierarchy routes
+app.use('/api', formHierarchyRoutes);
+
+// Form builder routes
+app.use('/api', formBuilderRoutes);
+
+// Member and provider lookup routes
+app.use('/api', memberProviderRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

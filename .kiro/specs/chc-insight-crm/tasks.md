@@ -79,22 +79,33 @@ The MVP focuses on three core capabilities using the hierarchical form taxonomy 
 
 ### **Phase 2: Basic Form Management Backend**
 
-- [ ] **MVP-2: Core form management services**
-  - [ ] 2.1 Implement form hierarchy management service
+- [x] **MVP-2: Core form management services**
+
+
+
+
+
+  - [x] 2.1 Implement form hierarchy management service
+
+
     - Create CRUD operations for form categories and types
     - Add form template management with version control
     - Implement form instance creation and management
     - Add basic validation and business rules
     - _Requirements: 1.1, 1.4, 9.1_
 
-  - [ ] 2.2 Create basic form builder backend
+  - [x] 2.2 Create basic form builder backend
+
+
     - Implement question management (text, select, yes/no types only)
     - Add form template copying and versioning
     - Create form preview functionality
     - Implement basic conditional logic for questions
     - _Requirements: 1.1, 1.2, 1.6_
 
-  - [ ] 2.3 Add member and provider lookup services
+  - [x] 2.3 Add member and provider lookup services
+
+
     - Create staging tables for member and provider data
     - Implement basic search functionality with type-ahead
     - Add data pre-population for form instances
