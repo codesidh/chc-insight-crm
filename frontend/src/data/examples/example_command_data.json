@@ -1,0 +1,37 @@
+{
+  "members": [
+    { "id": "1", "name": "John Doe", "memberId": "M001", "plan": "Medicaid" },
+    { "id": "2", "name": "Jane Smith", "memberId": "M002", "plan": "Medicare" },
+    { "id": "3", "name": "Bob Johnson", "memberId": "M003", "plan": "Dual" },
+    { "id": "4", "name": "Alice Brown", "memberId": "M004", "plan": "Medicaid" }
+  ],
+  "providers": [
+    { "id": "1", "name": "City Medical Center", "npi": "1234567890", "specialty": "Primary Care" },
+    { "id": "2", "name": "Riverside Hospital", "npi": "0987654321", "specialty": "Cardiology" },
+    { "id": "3", "name": "Downtown Clinic", "npi": "1122334455", "specialty": "Family Medicine" },
+    { "id": "4", "name": "Specialty Care Associates", "npi": "5566778899", "specialty": "Neurology" }
+  ],
+  "surveys": [
+    { "id": "1", "name": "Initial Assessment Template", "type": "Assessment", "status": "Active" },
+    { "id": "2", "name": "Provider Quality Survey", "type": "Quality", "status": "Active" },
+    { "id": "3", "name": "Member Satisfaction Survey", "type": "Satisfaction", "status": "Draft" },
+    { "id": "4", "name": "Incident Report Form", "type": "Incident", "status": "Active" }
+  ],
+  "quickActions": [
+    { "id": "create-survey", "label": "Create New Survey", "icon": "Plus", "shortcut": "⌘N" },
+    { "id": "work-queue", "label": "View Work Queue", "icon": "FileText", "shortcut": "⌘Q" },
+    { "id": "export-reports", "label": "Export Reports", "icon": "Download", "shortcut": "⌘E" }
+  ],
+  "navigationItems": [
+    { "id": "dashboard", "label": "Dashboard", "icon": "Calendar" },
+    { "id": "surveys", "label": "Surveys", "icon": "FileText" },
+    { "id": "members", "label": "Members", "icon": "User" },
+    { "id": "providers", "label": "Providers", "icon": "Building2" },
+    { "id": "settings", "label": "Settings", "icon": "Settings" }
+  ],
+  "recentSurveys": [
+    { "id": "1", "name": "Initial Assessment Template", "type": "Assessment" },
+    { "id": "2", "name": "Provider Quality Survey", "type": "Quality" },
+    { "id": "3", "name": "Member Satisfaction Survey", "type": "Satisfaction" }
+  ]
+}

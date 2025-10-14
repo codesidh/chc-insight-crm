@@ -1,0 +1,55 @@
+{
+  "complianceData": [
+    { "month": "Jan", "completed": 85, "pending": 15, "overdue": 5 },
+    { "month": "Feb", "completed": 88, "pending": 12, "overdue": 3 },
+    { "month": "Mar", "completed": 92, "pending": 8, "overdue": 2 },
+    { "month": "Apr", "completed": 89, "pending": 11, "overdue": 4 },
+    { "month": "May", "completed": 94, "pending": 6, "overdue": 1 },
+    { "month": "Jun", "completed": 91, "pending": 9, "overdue": 2 }
+  ],
+  "surveyTypeData": [
+    { "type": "Initial Assessment", "count": 245, "fill": "hsl(var(--chart-1))" },
+    { "type": "Reassessment", "count": 189, "fill": "hsl(var(--chart-2))" },
+    { "type": "Provider Survey", "count": 156, "fill": "hsl(var(--chart-3))" },
+    { "type": "Incident Report", "count": 78, "fill": "hsl(var(--chart-4))" },
+    { "type": "Satisfaction Survey", "count": 134, "fill": "hsl(var(--chart-5))" }
+  ],
+  "productivityData": [
+    { "user": "Alice Johnson", "surveys": 45, "avgTime": 28 },
+    { "user": "Bob Smith", "surveys": 38, "avgTime": 32 },
+    { "user": "Carol Davis", "surveys": 52, "avgTime": 25 },
+    { "user": "David Wilson", "surveys": 41, "avgTime": 30 },
+    { "user": "Eva Brown", "surveys": 47, "avgTime": 27 }
+  ],
+  "chartConfigs": {
+    "compliance": {
+      "completed": {
+        "label": "Completed",
+        "color": "hsl(var(--chart-1))"
+      },
+      "pending": {
+        "label": "Pending",
+        "color": "hsl(var(--chart-2))"
+      },
+      "overdue": {
+        "label": "Overdue",
+        "color": "hsl(var(--chart-3))"
+      }
+    },
+    "surveyType": {
+      "count": {
+        "label": "Survey Count"
+      }
+    },
+    "productivity": {
+      "surveys": {
+        "label": "Surveys Completed",
+        "color": "hsl(var(--chart-1))"
+      },
+      "avgTime": {
+        "label": "Avg Time (min)",
+        "color": "hsl(var(--chart-2))"
+      }
+    }
+  }
+}

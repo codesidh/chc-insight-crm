@@ -1,0 +1,75 @@
+{
+  "surveyTypes": [
+    { "value": "initial_assessment", "label": "Initial Assessment" },
+    { "value": "reassessment", "label": "Reassessment" },
+    { "value": "provider_survey", "label": "Provider Survey" },
+    { "value": "incident_report", "label": "Incident Report" },
+    { "value": "satisfaction_survey", "label": "Satisfaction Survey" }
+  ],
+  "reminderFrequencies": [
+    { "value": "daily", "label": "Daily" },
+    { "value": "weekly", "label": "Weekly" },
+    { "value": "biweekly", "label": "Bi-weekly" }
+  ],
+  "assessmentTypes": [
+    { "value": "initial", "label": "Initial" },
+    { "value": "annual", "label": "Annual" },
+    { "value": "change_in_condition", "label": "Change in Condition" },
+    { "value": "other", "label": "Other" }
+  ],
+  "levelsOfCare": [
+    { "value": "community", "label": "Community" },
+    { "value": "assisted_living", "label": "Assisted Living" },
+    { "value": "nursing_home", "label": "Nursing Home" },
+    { "value": "home_health", "label": "Home Health" }
+  ],
+  "cognitiveStatuses": [
+    { "value": "intact", "label": "Intact" },
+    { "value": "mild_impairment", "label": "Mild Impairment" },
+    { "value": "moderate_impairment", "label": "Moderate Impairment" },
+    { "value": "severe_impairment", "label": "Severe Impairment" }
+  ],
+  "careNeedsOptions": [
+    { "key": "personalCare", "label": "Personal Care" },
+    { "key": "homemaker", "label": "Homemaker Services" },
+    { "key": "nursing", "label": "Nursing Care" },
+    { "key": "therapy", "label": "Therapy Services" },
+    { "key": "transportation", "label": "Transportation" }
+  ],
+  "defaultValues": {
+    "surveyTemplate": {
+      "name": "",
+      "description": "",
+      "surveyType": "initial_assessment",
+      "isActive": true,
+      "dueDateDays": 30,
+      "reminderFrequency": "weekly",
+      "autoAssign": false,
+      "businessRules": {
+        "allowDuplicates": false,
+        "requireApproval": true,
+        "escalationDays": 7
+      }
+    },
+    "memberAssessment": {
+      "assessmentType": "initial",
+      "levelOfCare": "community",
+      "picsScore": 0,
+      "cognitiveStatus": "intact",
+      "functionalStatus": {
+        "adlScore": 0,
+        "iadlScore": 0,
+        "mobilityScore": 0
+      },
+      "healthConditions": [],
+      "medications": [],
+      "careNeeds": {
+        "personalCare": false,
+        "homemaker": false,
+        "nursing": false,
+        "therapy": false,
+        "transportation": false
+      }
+    }
+  }
+}

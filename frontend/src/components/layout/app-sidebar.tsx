@@ -52,6 +52,10 @@ const data = {
   ],
   navSecondary: [
     {
+      title: "Examples",
+      url: "/examples",
+    },
+    {
       title: "Settings",
       url: "/settings",
     },

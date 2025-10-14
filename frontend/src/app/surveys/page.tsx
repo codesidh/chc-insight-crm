@@ -14,9 +14,11 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react';
-import surveysData from '../data/surveys_data.json';
+import { getSurveysData } from '@/lib/app-data';
 
 export default function SurveysPage() {
+  const surveysData = getSurveysData();
+  
   return (
     <AppLayout headerTitle="Surveys">
       <div className="flex flex-1 flex-col">

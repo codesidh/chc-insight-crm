@@ -1,0 +1,99 @@
+{
+  "breadcrumbs": {
+    "survey": [
+      { "label": "Dashboard", "href": "/dashboard", "icon": "Home" },
+      { "label": "Surveys", "href": "/surveys" },
+      { "label": "Templates", "href": "/surveys/templates" },
+      { "label": "Initial Assessment Template", "current": true }
+    ],
+    "member": [
+      { "label": "Dashboard", "href": "/dashboard" },
+      { "label": "Members", "href": "/members" },
+      { "label": "John Doe (M001234)", "href": "/members/M001234" },
+      { "label": "Assessment History", "current": true }
+    ]
+  },
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 12,
+    "itemsPerPage": 25,
+    "totalItems": 287,
+    "pageSizeOptions": [
+      { "value": "10", "label": "10" },
+      { "value": "25", "label": "25" },
+      { "value": "50", "label": "50" },
+      { "value": "100", "label": "100" }
+    ]
+  },
+  "surveyDetailTabs": [
+    { "value": "overview", "label": "Overview", "icon": "FileText" },
+    { "value": "questions", "label": "Questions", "badge": "12" },
+    { "value": "logic", "label": "Logic Rules", "badge": "3" },
+    { "value": "workflow", "label": "Workflow" },
+    { "value": "history", "label": "History", "badge": "8" }
+  ],
+  "dashboardTabs": [
+    { "value": "overview", "label": "Overview", "icon": "BarChart3" },
+    { "value": "surveys", "label": "Surveys", "icon": "FileText", "badge": "24" },
+    { "value": "members", "label": "Members", "icon": "Users" },
+    { "value": "providers", "label": "Providers", "icon": "Building2" }
+  ],
+  "surveyQuestions": [
+    { "id": 1, "text": "What is your current level of care?", "type": "Single Select", "required": true },
+    { "id": 2, "text": "Please describe your living situation", "type": "Text Area", "required": true },
+    { "id": 3, "text": "Do you require assistance with daily activities?", "type": "Yes/No", "required": true },
+    { "id": 4, "text": "Upload any relevant medical documents", "type": "File Upload", "required": false }
+  ],
+  "logicRules": [
+    { 
+      "id": 1, 
+      "condition": "If 'Level of Care' equals 'Nursing Home'", 
+      "action": "Show 'Facility Information' section",
+      "status": "Active"
+    },
+    { 
+      "id": 2, 
+      "condition": "If 'Requires Assistance' equals 'Yes'", 
+      "action": "Show 'Care Needs Assessment' questions",
+      "status": "Active"
+    },
+    { 
+      "id": 3, 
+      "condition": "If 'Age' is greater than 65", 
+      "action": "Show 'Medicare Information' section",
+      "status": "Draft"
+    }
+  ],
+  "changeHistory": [
+    { "date": "April 2, 2024", "user": "Alice Johnson", "action": "Modified question validation rules", "version": "v1.3" },
+    { "date": "March 28, 2024", "user": "Bob Smith", "action": "Added new conditional logic rule", "version": "v1.2" },
+    { "date": "March 20, 2024", "user": "Carol Davis", "action": "Updated workflow configuration", "version": "v1.1" },
+    { "date": "March 15, 2024", "user": "Alice Johnson", "action": "Created initial template", "version": "v1.0" }
+  ],
+  "dashboardMetrics": [
+    {
+      "title": "Total Surveys",
+      "value": "1,234",
+      "change": "+12% from last month",
+      "icon": "FileText"
+    },
+    {
+      "title": "Completion Rate",
+      "value": "94.2%",
+      "change": "+2.1% from last month",
+      "icon": "BarChart3"
+    },
+    {
+      "title": "Active Members",
+      "value": "8,567",
+      "change": "+156 new this month",
+      "icon": "Users"
+    },
+    {
+      "title": "Overdue Surveys",
+      "value": "23",
+      "change": "-8 from yesterday",
+      "icon": "FileText"
+    }
+  ]
+}

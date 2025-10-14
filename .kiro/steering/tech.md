@@ -74,7 +74,7 @@ Both frontend and backend use consistent path aliases:
 ## Frontend Component Standards
 
 **MANDATORY**: All frontend components must use shadcn/ui components, forms, and blocks:
-
+**Data**: Let the data (hard coded values) for all pages, components, forms come from src/data/app/<component>_data.json file (application data) or src/data/examples/<component>_data.json file (example components)
 - **UI Components**: Use only shadcn/ui components (Button, Card, Dialog, etc.)
 - **Forms**: Use React Hook Form with shadcn form components and Zod validation
     - **useOptimistic for optimistic UI updates in forms**
@@ -87,8 +87,9 @@ Both frontend and backend use consistent path aliases:
 - **State Management**: For dashboard state
     - add: TanStack Query v5 - Server state management, caching for dashboard data 
     - Zustand (optional) - Global client state if needed (filters, UI preferences)
-
-Never create custom UI components when shadcn equivalents exist. Always check shadcn/ui registry first.
+**Always check shadcn/ui registry first.**
+**Never create custom UI components when shadcn equivalents exist.**
+**Remove unused import**
 
 ## Code Quality
 
@@ -96,3 +97,7 @@ Never create custom UI components when shadcn equivalents exist. Always check sh
 - ESLint + Prettier for consistent formatting
 - Pre-commit hooks for validation
 - 100% type coverage required
+
+## Document Standards 
+
+- Except for documents under .kiro folders move all other .md file to frontend/doc folder or backend/doc folder based on the implementation.

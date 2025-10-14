@@ -4,9 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Activity, CheckCircle } from 'lucide-react';
 import { getIcon } from '@/lib/icon-utils';
-import dashboardData from '../data/dashboard_data.json';
+import { getDashboardData } from '@/lib/app-data';
 
 export default function DashboardPage() {
+  const dashboardData = getDashboardData();
+  
   return (
     <AppLayout headerTitle="Dashboard">
       <div className="flex flex-1 flex-col">
