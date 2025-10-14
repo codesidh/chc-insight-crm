@@ -385,7 +385,7 @@ export class ProviderDataController {
   /**
    * Get provider statistics by network status
    */
-  getProviderStatsByNetworkStatus = async (req: Request, res: Response): Promise<void> => {
+  getProviderStatsByNetworkStatus = async (_req: Request, res: Response): Promise<void> => {
     try {
       const result = await this.providerDataService.getProviderStatsByNetworkStatus();
 
@@ -409,7 +409,7 @@ export class ProviderDataController {
   /**
    * Get provider statistics by specialty
    */
-  getProviderStatsBySpecialty = async (req: Request, res: Response): Promise<void> => {
+  getProviderStatsBySpecialty = async (_req: Request, res: Response): Promise<void> => {
     try {
       const result = await this.providerDataService.getProviderStatsBySpecialty();
 

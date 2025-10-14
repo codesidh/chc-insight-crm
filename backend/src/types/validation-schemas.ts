@@ -18,26 +18,26 @@ import {
 // ENUM SCHEMAS
 // ============================================================================
 
-export const FormCategoryTypeSchema = z.nativeEnum(FormCategoryType);
-export const CaseFormTypeSchema = z.nativeEnum(CaseFormType);
-export const AssessmentFormTypeSchema = z.nativeEnum(AssessmentFormType);
-export const FormStatusSchema = z.nativeEnum(FormStatus);
-export const QuestionTypeSchema = z.nativeEnum(QuestionType);
-export const UserRoleSchema = z.nativeEnum(UserRole);
-export const PrioritySchema = z.nativeEnum(Priority);
+const FormCategoryTypeSchema = z.nativeEnum(FormCategoryType);
+const CaseFormTypeSchema = z.nativeEnum(CaseFormType);
+const AssessmentFormTypeSchema = z.nativeEnum(AssessmentFormType);
+const FormStatusSchema = z.nativeEnum(FormStatus);
+const QuestionTypeSchema = z.nativeEnum(QuestionType);
+const UserRoleSchema = z.nativeEnum(UserRole);
+const PrioritySchema = z.nativeEnum(Priority);
 
 // ============================================================================
 // BASE SCHEMAS
 // ============================================================================
 
-export const BaseEntitySchema = z.object({
+const BaseEntitySchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string().uuid(),
   createdAt: z.date(),
   updatedAt: z.date().optional()
 });
 
-export const AuditTrailSchema = z.object({
+const AuditTrailSchema = z.object({
   createdBy: z.string().uuid(),
   updatedBy: z.string().uuid().optional(),
   createdAt: z.date(),
@@ -48,7 +48,7 @@ export const AuditTrailSchema = z.object({
 // CONTACT AND ADDRESS SCHEMAS
 // ============================================================================
 
-export const AddressSchema = z.object({
+const AddressSchema = z.object({
   street1: z.string().min(1).max(255),
   street2: z.string().max(255).optional(),
   city: z.string().min(1).max(100),
@@ -56,8 +56,8 @@ export const AddressSchema = z.object({
   zipCode: z.string().regex(/^\d{5}(-\d{4})?$/) // US zip code format
 });
 
-export const ContactInfoSchema = z.object({
-  phone: z.string().regex(/^\+?[\d\s\-\(\)\.]+$/).optional(),
+const ContactInfoSchema = z.object({
+  phone: z.string().regex(/^\+?[\d\s\-().]+$/).optional(),
   email: z.string().email().optional(),
   address: AddressSchema.optional()
 });
@@ -66,13 +66,13 @@ export const ContactInfoSchema = z.object({
 // FORM HIERARCHY SCHEMAS
 // ============================================================================
 
-export const FormCategorySchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
+const FormCategorySchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
   name: FormCategoryTypeSchema,
   description: z.string().max(500).optional(),
   isActive: z.boolean().default(true)
 });
 
-export const BusinessRuleSchema = z.object({
+const BusinessRuleSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(255),
   description: z.string().max(1000),
@@ -82,7 +82,7 @@ export const BusinessRuleSchema = z.object({
   isActive: z.boolean().default(true)
 });
 
-export const FormTypeSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
+const FormTypeSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
   categoryId: z.string().uuid(),
   name: z.string().min(1).max(255),
   description: z.string().max(500).optional(),
@@ -94,31 +94,31 @@ export const FormTypeSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
 // QUESTION AND VALIDATION SCHEMAS
 // ============================================================================
 
-export const ValidationRuleSchema = z.object({
+const ValidationRuleSchema = z.object({
   type: z.enum(['required', 'minLength', 'maxLength', 'pattern', 'min', 'max', 'email', 'phone']),
   value: z.any().optional(),
   message: z.string().min(1).max(255)
 });
 
-export const QuestionOptionSchema = z.object({
+const QuestionOptionSchema = z.object({
   id: z.string().uuid(),
   label: z.string().min(1).max(255),
   value: z.string().min(1).max(255),
   order: z.number().int().min(0)
 });
 
-export const ConditionalRuleSchema = z.object({
+const ConditionalRuleSchema = z.object({
   id: z.string().uuid(),
   condition: z.object({
     questionId: z.string().uuid(),
     operator: z.enum(['equals', 'not_equals', 'contains', 'greater_than', 'less_than']),
-    value: z.any()
+    value: z.any().optional()
   }),
   action: z.enum(['show', 'hide', 'require', 'disable']),
   targetQuestionIds: z.array(z.string().uuid())
 });
 
-export const QuestionSchema = z.object({
+const QuestionSchema = z.object({
   id: z.string().uuid(),
   type: QuestionTypeSchema,
   text: z.string().min(1).max(1000),
@@ -136,14 +136,14 @@ export const QuestionSchema = z.object({
 // WORKFLOW SCHEMAS
 // ============================================================================
 
-export const NotificationConfigSchema = z.object({
+const NotificationConfigSchema = z.object({
   type: z.enum(['email', 'sms', 'in_app']),
   template: z.string().min(1).max(255),
   recipients: z.array(z.string().email()),
   conditions: z.record(z.any()).optional()
 });
 
-export const WorkflowStateSchema = z.object({
+const WorkflowStateSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(255),
   type: z.enum(['initial', 'intermediate', 'final']),
@@ -151,7 +151,7 @@ export const WorkflowStateSchema = z.object({
   notifications: z.array(NotificationConfigSchema).optional()
 });
 
-export const WorkflowTransitionSchema = z.object({
+const WorkflowTransitionSchema = z.object({
   id: z.string().uuid(),
   fromStateId: z.string().uuid(),
   toStateId: z.string().uuid(),
@@ -160,7 +160,7 @@ export const WorkflowTransitionSchema = z.object({
   requiredRole: UserRoleSchema.optional()
 });
 
-export const ApprovalStepSchema = z.object({
+const ApprovalStepSchema = z.object({
   id: z.string().uuid(),
   order: z.number().int().min(1),
   approverRole: UserRoleSchema,
@@ -169,7 +169,7 @@ export const ApprovalStepSchema = z.object({
   escalationTimeHours: z.number().int().min(1).optional()
 });
 
-export const WorkflowConfigSchema = z.object({
+const WorkflowConfigSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(255),
   states: z.array(WorkflowStateSchema).min(1),
@@ -181,21 +181,21 @@ export const WorkflowConfigSchema = z.object({
 // CONFIGURATION SCHEMAS
 // ============================================================================
 
-export const DueDateRuleSchema = z.object({
+const DueDateRuleSchema = z.object({
   type: z.enum(['days_from_creation', 'days_from_assignment', 'business_days', 'calendar_days']),
   value: z.number().int().min(1),
   excludeWeekends: z.boolean().default(false),
   excludeHolidays: z.boolean().default(false)
 });
 
-export const ReminderConfigSchema = z.object({
+const ReminderConfigSchema = z.object({
   enabled: z.boolean().default(true),
   frequency: z.enum(['daily', 'weekly', 'custom']),
   daysBeforeDue: z.array(z.number().int().min(1)),
   escalationDays: z.number().int().min(1).optional()
 });
 
-export const AssignmentRuleSchema = z.object({
+const AssignmentRuleSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(255),
   priority: z.number().int().min(1),
@@ -216,7 +216,7 @@ export const AssignmentRuleSchema = z.object({
 // FORM TEMPLATE AND INSTANCE SCHEMAS
 // ============================================================================
 
-export const FormTemplateSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
+const FormTemplateSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
   typeId: z.string().uuid(),
   name: z.string().min(1).max(255),
   description: z.string().max(1000).optional(),
@@ -231,14 +231,14 @@ export const FormTemplateSchema = BaseEntitySchema.merge(AuditTrailSchema).exten
   autoAssignmentRules: z.array(AssignmentRuleSchema).optional()
 });
 
-export const ResponseDataSchema = z.object({
+const ResponseDataSchema = z.object({
   questionId: z.string().uuid(),
-  value: z.any(),
+  value: z.any().optional(),
   metadata: z.record(z.any()).optional(),
   respondedAt: z.date()
 });
 
-export const FormInstanceSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
+const FormInstanceSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
   templateId: z.string().uuid(),
   memberId: z.string().max(50).optional(),
   providerId: z.string().max(50).optional(),
@@ -257,19 +257,19 @@ export const FormInstanceSchema = BaseEntitySchema.merge(AuditTrailSchema).exten
 // USER MANAGEMENT SCHEMAS
 // ============================================================================
 
-export const PermissionSchema = z.object({
+const PermissionSchema = z.object({
   resource: z.string().min(1).max(100),
   actions: z.array(z.string().min(1).max(50)),
   conditions: z.record(z.any()).optional()
 });
 
-export const RoleSchema = BaseEntitySchema.extend({
+const RoleSchema = BaseEntitySchema.extend({
   name: UserRoleSchema,
   description: z.string().max(500),
   permissions: z.array(PermissionSchema)
 });
 
-export const UserSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
+const UserSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
   email: z.string().email().max(255),
   passwordHash: z.string().min(1),
   firstName: z.string().min(1).max(100),
@@ -281,7 +281,7 @@ export const UserSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
   providerNetwork: z.array(z.string()).optional()
 });
 
-export const UserRoleAssignmentSchema = z.object({
+const UserRoleAssignmentSchema = z.object({
   userId: z.string().uuid(),
   roleId: z.string().uuid(),
   assignedAt: z.date(),
@@ -292,12 +292,12 @@ export const UserRoleAssignmentSchema = z.object({
 // DATA PRE-POPULATION AND MANAGEMENT SCHEMAS
 // ============================================================================
 
-export const ServiceCoordinatorSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
+const ServiceCoordinatorSchema = BaseEntitySchema.merge(AuditTrailSchema).extend({
   scid: z.string().min(1).max(50),
   firstName: z.string().min(1).max(100),
   lastName: z.string().min(1).max(100),
   email: z.string().email().max(255),
-  phone: z.string().regex(/^\+?[\d\s\-\(\)\.]+$/).optional(),
+  phone: z.string().regex(/^\+?[\d\s\-().]+$/).optional(),
   organization: z.string().min(1).max(255),
   zone: z.enum(['SW', 'SE', 'NE', 'NW', 'LC']),
   supervisorId: z.string().uuid().optional(),
@@ -312,7 +312,7 @@ export const ServiceCoordinatorSchema = BaseEntitySchema.merge(AuditTrailSchema)
   lastUpdated: z.date()
 });
 
-export const MemberDataSchema = z.object({
+const MemberDataSchema = z.object({
   memberDataId: z.string().max(50),
   medicaidId: z.string().min(1).max(50),
   hcinId: z.string().min(1).max(50),
@@ -339,7 +339,7 @@ export const MemberDataSchema = z.object({
   serviceCoordinator: ServiceCoordinatorSchema.optional() // Populated via join
 });
 
-export const ProviderDataSchema = z.object({
+const ProviderDataSchema = z.object({
   id: z.string().max(50),
   name: z.string().min(1).max(255),
   npi: z.string().length(10), // NPI is always 10 digits
@@ -361,7 +361,7 @@ export const ProviderDataSchema = z.object({
 // TENANT CONFIGURATION SCHEMAS
 // ============================================================================
 
-export const DatabaseConfigSchema = z.object({
+const DatabaseConfigSchema = z.object({
   host: z.string().min(1),
   port: z.number().int().min(1).max(65535),
   database: z.string().min(1),
@@ -370,12 +370,12 @@ export const DatabaseConfigSchema = z.object({
   ssl: z.boolean().default(false)
 });
 
-export const EmailConfigSchema = z.object({
+const EmailConfigSchema = z.object({
   provider: z.enum(['smtp', 'sendgrid', 'ses']),
   configuration: z.record(z.any())
 });
 
-export const SftpConfigSchema = z.object({
+const SftpConfigSchema = z.object({
   host: z.string().min(1),
   port: z.number().int().min(1).max(65535),
   username: z.string().min(1),
@@ -383,7 +383,7 @@ export const SftpConfigSchema = z.object({
   privateKey: z.string().optional()
 });
 
-export const TenantConfigSchema = z.object({
+const TenantConfigSchema = z.object({
   branding: z.object({
     logo: z.string().url().optional(),
     primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
@@ -400,7 +400,7 @@ export const TenantConfigSchema = z.object({
   }).optional()
 });
 
-export const TenantSchema = BaseEntitySchema.extend({
+const TenantSchema = BaseEntitySchema.extend({
   name: z.string().min(1).max(255),
   subdomain: z.string().regex(/^[a-z0-9-]+$/).max(50).optional(),
   configuration: TenantConfigSchema,
@@ -411,14 +411,14 @@ export const TenantSchema = BaseEntitySchema.extend({
 // API SCHEMAS
 // ============================================================================
 
-export const ApiErrorSchema = z.object({
+const ApiErrorSchema = z.object({
   code: z.string().min(1).max(50),
   message: z.string().min(1).max(500),
   details: z.record(z.any()).optional(),
   stack: z.string().optional()
 });
 
-export const ApiResponseSchema = z.object({
+const ApiResponseSchema = z.object({
   success: z.boolean(),
   data: z.any().optional(),
   error: ApiErrorSchema.optional(),
@@ -430,7 +430,7 @@ export const ApiResponseSchema = z.object({
   }).optional()
 });
 
-export const PaginationParamsSchema = z.object({
+const PaginationParamsSchema = z.object({
   page: z.number().int().min(1).default(1),
   limit: z.number().int().min(1).max(100).default(20),
   sortBy: z.string().max(100).optional(),
@@ -441,47 +441,47 @@ export const PaginationParamsSchema = z.object({
 // CREATE/UPDATE SCHEMAS (for API endpoints)
 // ============================================================================
 
-export const CreateFormCategorySchema = FormCategorySchema.omit({
+const CreateFormCategorySchema = FormCategorySchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true
 });
 
-export const UpdateFormCategorySchema = CreateFormCategorySchema.partial().extend({
+const UpdateFormCategorySchema = CreateFormCategorySchema.partial().extend({
   updatedBy: z.string().uuid()
 });
 
-export const CreateFormTypeSchema = FormTypeSchema.omit({
+const CreateFormTypeSchema = FormTypeSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true
 });
 
-export const UpdateFormTypeSchema = CreateFormTypeSchema.partial().extend({
+const UpdateFormTypeSchema = CreateFormTypeSchema.partial().extend({
   updatedBy: z.string().uuid()
 });
 
-export const CreateFormTemplateSchema = FormTemplateSchema.omit({
+const CreateFormTemplateSchema = FormTemplateSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true
 });
 
-export const UpdateFormTemplateSchema = CreateFormTemplateSchema.partial().extend({
+const UpdateFormTemplateSchema = CreateFormTemplateSchema.partial().extend({
   updatedBy: z.string().uuid()
 });
 
-export const CreateFormInstanceSchema = FormInstanceSchema.omit({
+const CreateFormInstanceSchema = FormInstanceSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true
 });
 
-export const UpdateFormInstanceSchema = CreateFormInstanceSchema.partial().extend({
+const UpdateFormInstanceSchema = CreateFormInstanceSchema.partial().extend({
   updatedBy: z.string().uuid()
 });
 
-export const CreateUserSchema = UserSchema.omit({
+const CreateUserSchema = UserSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -490,18 +490,18 @@ export const CreateUserSchema = UserSchema.omit({
   password: z.string().min(8).max(128)
 });
 
-export const UpdateUserSchema = CreateUserSchema.partial().extend({
+const UpdateUserSchema = CreateUserSchema.partial().extend({
   updatedBy: z.string().uuid()
 });
 
-export const CreateServiceCoordinatorSchema = ServiceCoordinatorSchema.omit({
+const CreateServiceCoordinatorSchema = ServiceCoordinatorSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
   currentCaseload: true
 });
 
-export const UpdateServiceCoordinatorSchema = CreateServiceCoordinatorSchema.partial().extend({
+const UpdateServiceCoordinatorSchema = CreateServiceCoordinatorSchema.partial().extend({
   updatedBy: z.string().uuid()
 });
 
@@ -509,19 +509,19 @@ export const UpdateServiceCoordinatorSchema = CreateServiceCoordinatorSchema.par
 // AUTHENTICATION SCHEMAS
 // ============================================================================
 
-export const LoginCredentialsSchema = z.object({
+const LoginCredentialsSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1)
 });
 
-export const AuthTokenSchema = z.object({
+const AuthTokenSchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
   expiresIn: z.number().int().min(1),
   tokenType: z.string().default('Bearer')
 });
 
-export const UserContextSchema = z.object({
+const UserContextSchema = z.object({
   userId: z.string().uuid(),
   tenantId: z.string().uuid(),
   roles: z.array(RoleSchema),
@@ -533,17 +533,17 @@ export const UserContextSchema = z.object({
 // SEARCH AND FILTER SCHEMAS
 // ============================================================================
 
-export const MemberSearchSchema = z.object({
+const MemberSearchSchema = z.object({
   query: z.string().min(1).max(255),
   limit: z.number().int().min(1).max(50).default(10)
 });
 
-export const ProviderSearchSchema = z.object({
+const ProviderSearchSchema = z.object({
   query: z.string().min(1).max(255),
   limit: z.number().int().min(1).max(50).default(10)
 });
 
-export const FormInstanceFilterSchema = z.object({
+const FormInstanceFilterSchema = z.object({
   status: z.array(FormStatusSchema).optional(),
   assignedTo: z.string().uuid().optional(),
   memberId: z.string().optional(),
@@ -568,60 +568,60 @@ export {
   QuestionTypeSchema,
   UserRoleSchema,
   PrioritySchema,
-  
+
   // Base schemas
   BaseEntitySchema,
   AuditTrailSchema,
-  
+
   // Contact schemas
   AddressSchema,
   ContactInfoSchema,
-  
+
   // Form hierarchy schemas
   FormCategorySchema,
   FormTypeSchema,
   FormTemplateSchema,
   FormInstanceSchema,
-  
+
   // Question schemas
   QuestionSchema,
   QuestionOptionSchema,
   ValidationRuleSchema,
   ConditionalRuleSchema,
   ResponseDataSchema,
-  
+
   // Workflow schemas
   WorkflowConfigSchema,
   WorkflowStateSchema,
   WorkflowTransitionSchema,
   ApprovalStepSchema,
-  
+
   // User management schemas
   UserSchema,
   RoleSchema,
   PermissionSchema,
   UserRoleAssignmentSchema,
-  
+
   // Configuration schemas
   DueDateRuleSchema,
   ReminderConfigSchema,
   AssignmentRuleSchema,
   NotificationConfigSchema,
-  
+
   // Data schemas
   ServiceCoordinatorSchema,
   MemberDataSchema,
   ProviderDataSchema,
-  
+
   // Tenant schemas
   TenantSchema,
   TenantConfigSchema,
-  
+
   // API schemas
   ApiResponseSchema,
   ApiErrorSchema,
   PaginationParamsSchema,
-  
+
   // Create/Update schemas
   CreateFormCategorySchema,
   UpdateFormCategorySchema,
@@ -635,12 +635,12 @@ export {
   UpdateUserSchema,
   CreateServiceCoordinatorSchema,
   UpdateServiceCoordinatorSchema,
-  
+
   // Auth schemas
   LoginCredentialsSchema,
   AuthTokenSchema,
   UserContextSchema,
-  
+
   // Search schemas
   MemberSearchSchema,
   ProviderSearchSchema,

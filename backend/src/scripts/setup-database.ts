@@ -29,7 +29,7 @@ async function setupDatabase() {
       console.log('✅ Database is already up to date');
     } else {
       console.log(`✅ Ran ${migrationFiles.length} migrations in batch ${batchNo}:`);
-      migrationFiles.forEach(file => console.log(`   - ${file}`));
+      migrationFiles.forEach((file: string) => console.log(`   - ${file}`));
     }
 
     // Run seeds
@@ -40,7 +40,7 @@ async function setupDatabase() {
       console.log('✅ No seed files to run');
     } else {
       console.log(`✅ Ran ${seedFiles[0].length} seed files:`);
-      seedFiles[0].forEach(file => console.log(`   - ${file}`));
+      seedFiles[0].forEach((file: string) => console.log(`   - ${file}`));
     }
 
     console.log('\n🎉 Database setup completed successfully!');

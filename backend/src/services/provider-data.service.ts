@@ -316,10 +316,13 @@ export class ProviderDataService {
         .count('* as count')
         .groupBy('network_status');
 
-      const networkStats = stats.reduce((acc, stat) => {
-        acc[stat.network_status] = parseInt(stat['count'] as string);
-        return acc;
-      }, {} as Record<string, number>);
+      const networkStats: Record<string, number> = {};
+      for (const stat of stats) {
+        const networkStatus = stat['network_status'] as string;
+        if (networkStatus) {
+          networkStats[networkStatus] = parseInt(stat['count'] as string) || 0;
+        }
+      }
 
       return {
         success: true,
@@ -350,10 +353,13 @@ export class ProviderDataService {
         .orderBy('count', 'desc')
         .limit(20); // Top 20 specialties
 
-      const specialtyStats = stats.reduce((acc, stat) => {
-        acc[stat.specialty] = parseInt(stat['count'] as string);
-        return acc;
-      }, {} as Record<string, number>);
+      const specialtyStats: Record<string, number> = {};
+      for (const stat of stats) {
+        const specialty = stat['specialty'] as string;
+        if (specialty) {
+          specialtyStats[specialty] = parseInt(stat['count'] as string) || 0;
+        }
+      }
 
       return {
         success: true,

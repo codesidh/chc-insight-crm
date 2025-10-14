@@ -14,7 +14,7 @@ import {
   FormType,
   FormTemplate,
   FormInstance,
-  FormCategoryType,
+
   FormStatus,
   CreateFormCategorySchema,
   UpdateFormCategorySchema,
@@ -55,12 +55,12 @@ export class FormHierarchyService {
         .orderBy('name');
 
       // Apply filters
-      if (filters?.isActive !== undefined) {
-        query = query.where('is_active', filters.isActive);
+      if (filters?.['isActive'] !== undefined) {
+        query = query.where('is_active', filters['isActive']);
       }
 
-      if (filters?.name) {
-        query = query.where('name', 'ilike', `%${filters.name}%`);
+      if (filters?.['name']) {
+        query = query.where('name', 'ilike', `%${filters['name']}%`);
       }
 
       // Apply pagination
@@ -79,7 +79,7 @@ export class FormHierarchyService {
         success: true,
         data: categories,
         metadata: {
-          total: parseInt(total?.count as string) || 0,
+          total: parseInt(total?.['count'] as string) || 0,
           page: pagination?.page || 1,
           limit: pagination?.limit || categories.length,
           timestamp: new Date()
@@ -290,7 +290,7 @@ export class FormHierarchyService {
         .count('* as count')
         .first();
 
-      if (parseInt(activeTypes?.count as string) > 0) {
+      if (parseInt(activeTypes?.['count'] as string) > 0) {
         return {
           success: false,
           error: {
@@ -344,12 +344,12 @@ export class FormHierarchyService {
         .orderBy('name');
 
       // Apply filters
-      if (filters?.isActive !== undefined) {
-        query = query.where('is_active', filters.isActive);
+      if (filters?.['isActive'] !== undefined) {
+        query = query.where('is_active', filters['isActive']);
       }
 
-      if (filters?.name) {
-        query = query.where('name', 'ilike', `%${filters.name}%`);
+      if (filters?.['name']) {
+        query = query.where('name', 'ilike', `%${filters['name']}%`);
       }
 
       // Apply pagination
@@ -368,7 +368,7 @@ export class FormHierarchyService {
         success: true,
         data: types,
         metadata: {
-          total: parseInt(total?.count as string) || 0,
+          total: parseInt(total?.['count'] as string) || 0,
           page: pagination?.page || 1,
           limit: pagination?.limit || types.length,
           timestamp: new Date()
@@ -601,7 +601,7 @@ export class FormHierarchyService {
         .count('* as count')
         .first();
 
-      if (parseInt(activeTemplates?.count as string) > 0) {
+      if (parseInt(activeTemplates?.['count'] as string) > 0) {
         return {
           success: false,
           error: {
@@ -655,16 +655,16 @@ export class FormHierarchyService {
         .orderBy([{ column: 'name' }, { column: 'version', order: 'desc' }]);
 
       // Apply filters
-      if (filters?.isActive !== undefined) {
-        query = query.where('is_active', filters.isActive);
+      if (filters?.['isActive'] !== undefined) {
+        query = query.where('is_active', filters['isActive']);
       }
 
-      if (filters?.name) {
-        query = query.where('name', 'ilike', `%${filters.name}%`);
+      if (filters?.['name']) {
+        query = query.where('name', 'ilike', `%${filters['name']}%`);
       }
 
-      if (filters?.version) {
-        query = query.where('version', filters.version);
+      if (filters?.['version']) {
+        query = query.where('version', filters['version']);
       }
 
       // Apply pagination
@@ -683,7 +683,7 @@ export class FormHierarchyService {
         success: true,
         data: templates,
         metadata: {
-          total: parseInt(total?.count as string) || 0,
+          total: parseInt(total?.['count'] as string) || 0,
           page: pagination?.page || 1,
           limit: pagination?.limit || templates.length,
           timestamp: new Date()
@@ -813,7 +813,7 @@ export class FormHierarchyService {
         .max('version as max_version')
         .first();
 
-      const nextVersion = (latestVersion?.max_version || 0) + 1;
+      const nextVersion = (latestVersion?.['max_version'] || 0) + 1;
 
       const templateId = uuidv4();
       const now = new Date();
@@ -899,7 +899,7 @@ export class FormHierarchyService {
         .max('version as max_version')
         .first();
 
-      const nextVersion = (latestVersion?.max_version || 0) + 1;
+      const nextVersion = (latestVersion?.['max_version'] || 0) + 1;
 
       const templateId = uuidv4();
       const now = new Date();
@@ -1056,7 +1056,7 @@ export class FormHierarchyService {
         .count('* as count')
         .first();
 
-      if (parseInt(activeInstances?.count as string) > 0) {
+      if (parseInt(activeInstances?.['count'] as string) > 0) {
         return {
           success: false,
           error: {
@@ -1110,32 +1110,32 @@ export class FormHierarchyService {
         .orderBy('created_at', 'desc');
 
       // Apply filters
-      if (filters?.status) {
-        if (Array.isArray(filters.status)) {
-          query = query.whereIn('status', filters.status);
+      if (filters?.['status']) {
+        if (Array.isArray(filters['status'])) {
+          query = query.whereIn('status', filters['status']);
         } else {
-          query = query.where('status', filters.status);
+          query = query.where('status', filters['status']);
         }
       }
 
-      if (filters?.assignedTo) {
-        query = query.where('assigned_to', filters.assignedTo);
+      if (filters?.['assignedTo']) {
+        query = query.where('assigned_to', filters['assignedTo']);
       }
 
-      if (filters?.memberId) {
-        query = query.where('member_id', filters.memberId);
+      if (filters?.['memberId']) {
+        query = query.where('member_id', filters['memberId']);
       }
 
-      if (filters?.providerId) {
-        query = query.where('provider_id', filters.providerId);
+      if (filters?.['providerId']) {
+        query = query.where('provider_id', filters['providerId']);
       }
 
-      if (filters?.dueDateFrom) {
-        query = query.where('due_date', '>=', filters.dueDateFrom);
+      if (filters?.['dueDateFrom']) {
+        query = query.where('due_date', '>=', filters['dueDateFrom']);
       }
 
-      if (filters?.dueDateTo) {
-        query = query.where('due_date', '<=', filters.dueDateTo);
+      if (filters?.['dueDateTo']) {
+        query = query.where('due_date', '<=', filters['dueDateTo']);
       }
 
       // Apply pagination
@@ -1154,7 +1154,7 @@ export class FormHierarchyService {
         success: true,
         data: instances,
         metadata: {
-          total: parseInt(total?.count as string) || 0,
+          total: parseInt(total?.['count'] as string) || 0,
           page: pagination?.page || 1,
           limit: pagination?.limit || instances.length,
           timestamp: new Date()
@@ -1466,7 +1466,7 @@ export class FormHierarchyService {
       case 'days_from_assignment':
         dueDate.setDate(dueDate.getDate() + dueDateRule.value);
         break;
-      case 'business_days':
+      case 'business_days': {
         let businessDaysAdded = 0;
         while (businessDaysAdded < dueDateRule.value) {
           dueDate.setDate(dueDate.getDate() + 1);
@@ -1476,6 +1476,7 @@ export class FormHierarchyService {
           }
         }
         break;
+      }
       case 'calendar_days':
       default:
         dueDate.setDate(dueDate.getDate() + dueDateRule.value);

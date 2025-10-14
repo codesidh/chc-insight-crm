@@ -33,7 +33,7 @@ export class FormBuilderController {
    * GET /api/form-builder/question-types
    * Get available question types for form building
    */
-  getQuestionTypeLibrary = async (req: Request, res: Response): Promise<void> => {
+  getQuestionTypeLibrary = async (_req: Request, res: Response): Promise<void> => {
     try {
       const result = this.formBuilderService.getQuestionTypeLibrary();
 
@@ -67,6 +67,14 @@ export class FormBuilderController {
       const { templateId } = req.params;
       const tenantId = req.user?.tenantId;
       const userId = req.user?.userId;
+
+      if (!templateId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_TEMPLATE_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
 
       if (!tenantId || !userId) {
         res.status(401).json({
@@ -134,6 +142,14 @@ export class FormBuilderController {
         return;
       }
 
+      if (!templateId || !questionId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: 'Template ID and Question ID are required' }
+        });
+        return;
+      }
+
       // Validate request body (partial question update)
       const validationResult = QuestionSchema.partial().safeParse(req.body);
 
@@ -194,6 +210,14 @@ export class FormBuilderController {
         return;
       }
 
+      if (!templateId || !questionId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: 'Template ID and Question ID are required' }
+        });
+        return;
+      }
+
       const result = await this.formBuilderService.deleteQuestion(
         templateId,
         tenantId,
@@ -229,6 +253,14 @@ export class FormBuilderController {
       const { templateId } = req.params;
       const tenantId = req.user?.tenantId;
       const userId = req.user?.userId;
+
+      if (!templateId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_TEMPLATE_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
 
       if (!tenantId || !userId) {
         res.status(401).json({
@@ -300,6 +332,14 @@ export class FormBuilderController {
       const tenantId = req.user?.tenantId;
       const userId = req.user?.userId;
 
+      if (!templateId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_TEMPLATE_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
+
       if (!tenantId || !userId) {
         res.status(401).json({
           success: false,
@@ -341,6 +381,14 @@ export class FormBuilderController {
     try {
       const { typeId, templateName } = req.params;
       const tenantId = req.user?.tenantId;
+
+      if (!typeId || !templateName) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_PARAMETERS', message: 'Type ID and template name are required' }
+        });
+        return;
+      }
 
       if (!tenantId) {
         res.status(401).json({
@@ -386,6 +434,14 @@ export class FormBuilderController {
       const { templateId } = req.params;
       const tenantId = req.user?.tenantId;
 
+      if (!templateId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_TEMPLATE_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
+
       if (!tenantId) {
         res.status(401).json({
           success: false,
@@ -396,9 +452,9 @@ export class FormBuilderController {
 
       // Parse sample data from query parameters if provided
       let sampleData: Record<string, any> | undefined;
-      if (req.query.sampleData) {
+      if (req.query['sampleData']) {
         try {
-          sampleData = JSON.parse(req.query.sampleData as string);
+          sampleData = JSON.parse(req.query['sampleData'] as string);
         } catch {
           res.status(400).json({
             success: false,
@@ -447,6 +503,14 @@ export class FormBuilderController {
     try {
       const { templateId } = req.params;
       const tenantId = req.user?.tenantId;
+
+      if (!templateId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_TEMPLATE_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
 
       if (!tenantId) {
         res.status(401).json({

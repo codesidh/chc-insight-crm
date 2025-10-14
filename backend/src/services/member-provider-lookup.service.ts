@@ -385,13 +385,23 @@ export class MemberProviderLookupService {
       memberZone: dbRow.member_zone,
       picsScore: dbRow.pics_score,
       assignedSCID: dbRow.assigned_scid,
-      scName: dbRow.sc_name,
-      scOrg: dbRow.sc_org,
-      scZone: dbRow.sc_zone,
-      scSupervisorName: dbRow.sc_supervisor_name,
-      scManagerName: dbRow.sc_manager_name,
-      scDirectorName: dbRow.sc_director_name,
-      lastUpdated: new Date(dbRow.last_updated)
+      lastUpdated: new Date(dbRow.last_updated),
+      serviceCoordinator: dbRow.sc_name ? {
+        id: dbRow.sc_id || '',
+        tenantId: dbRow.tenant_id || '',
+        scid: dbRow.assigned_scid,
+        firstName: dbRow.sc_first_name || '',
+        lastName: dbRow.sc_last_name || '',
+        email: dbRow.sc_email || '',
+        organization: dbRow.sc_org || '',
+        zone: dbRow.sc_zone || 'SW',
+        isActive: true,
+        currentCaseload: 0,
+        hireDate: new Date(),
+        lastUpdated: new Date(),
+        createdBy: '',
+        createdAt: new Date()
+      } : undefined
     };
 
     // Handle optional fields

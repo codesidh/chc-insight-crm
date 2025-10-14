@@ -7,7 +7,7 @@ import { errorHandler } from '@/middleware/errorHandler';
 import { requestLogger } from '@/middleware/requestLogger';
 import { DatabaseService } from '@/services/database.service';
 import { createAuthRoutes } from '@/routes/auth.routes';
-import { createAuthMiddleware } from '@/middleware/auth.middleware';
+
 import formHierarchyRoutes from '@/routes/form-hierarchy.routes';
 import formBuilderRoutes from '@/routes/form-builder.routes';
 import memberProviderRoutes from '@/routes/member-provider-lookup.routes';
@@ -108,7 +108,7 @@ app.use('/api/auth', (req, res, next) => {
       message: 'Authentication service is initializing'
     });
   }
-  authRoutes(req, res, next);
+  return authRoutes(req, res, next);
 });
 
 // Form hierarchy routes

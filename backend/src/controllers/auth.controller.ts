@@ -3,8 +3,7 @@ import { Knex } from 'knex';
 import { AuthService } from '../services/auth.service';
 import { 
   LoginCredentialsSchema, 
-  CreateUserSchema,
-  UpdateUserSchema 
+ 
 } from '../types/validation-schemas';
 import { ApiResponse } from '../types';
 

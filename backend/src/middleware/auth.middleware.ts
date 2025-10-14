@@ -88,7 +88,7 @@ export class AuthMiddleware {
       }
 
       const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
-      const userRoles = req.user.roles.map(role => role.name);
+      const userRoles = req.user.roles.map(role => role.name as string);
       
       const hasRequiredRole = roles.some(role => userRoles.includes(role));
       
@@ -178,7 +178,7 @@ export class AuthMiddleware {
   /**
    * Optional authentication - doesn't fail if no token provided
    */
-  optionalAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  optionalAuth = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
       const authHeader = req.headers.authorization;
       
@@ -273,6 +273,53 @@ export class AuthMiddleware {
 export const createAuthMiddleware = (db: Knex): AuthMiddleware => {
   const authService = new AuthService(db);
   return new AuthMiddleware(db, authService);
+};
+
+/**
+ * Simple auth middleware function for routes
+ * This creates a basic JWT authentication middleware
+ */
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Access token required'
+        }
+      });
+      return;
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    
+    // Verify JWT token
+    const decoded = jwt.verify(token, config.jwt.secret) as any;
+    
+    // Attach user context to request
+    req.user = {
+      userId: decoded.userId,
+      tenantId: decoded.tenantId,
+      roles: decoded.roles || [],
+      permissions: decoded.permissions || [],
+      sessionId: decoded.sessionId
+    };
+    req.tenantId = decoded.tenantId;
+    
+    next();
+  } catch (error) {
+    console.error('Authentication middleware error:', error);
+    res.status(401).json({
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid or expired token'
+      }
+    });
+  }
 };
 
 export default AuthMiddleware;

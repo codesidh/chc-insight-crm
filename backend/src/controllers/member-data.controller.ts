@@ -333,7 +333,7 @@ export class MemberDataController {
   /**
    * Get member statistics by zone
    */
-  getMemberStatsByZone = async (req: Request, res: Response): Promise<void> => {
+  getMemberStatsByZone = async (_req: Request, res: Response): Promise<void> => {
     try {
       const result = await this.memberDataService.getMemberStatsByZone();
 

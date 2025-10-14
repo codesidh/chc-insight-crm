@@ -215,7 +215,7 @@ export interface ConditionalRule {
   condition: {
     questionId: string;
     operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
-    value: any;
+    value?: any;
   };
   action: 'show' | 'hide' | 'require' | 'disable';
   targetQuestionIds: string[];
@@ -226,7 +226,7 @@ export interface ConditionalRule {
  */
 export interface ResponseData {
   questionId: string;
-  value: any;
+  value?: any;
   metadata?: Record<string, any>;
   respondedAt: Date;
 }
@@ -339,6 +339,17 @@ export interface UserRoleAssignment {
   roleId: string;
   assignedAt: Date;
   assignedBy: string;
+}
+
+/**
+ * User context for authentication and authorization
+ */
+export interface UserContext {
+  userId: string;
+  tenantId: string;
+  roles: Role[];
+  permissions: Permission[];
+  sessionId: string;
 }
 
 // ============================================================================

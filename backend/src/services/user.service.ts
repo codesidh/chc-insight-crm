@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import { User, Role, UserRole } from '../types';
+import { User, Role } from '../types';
 import { 
   CreateUserSchema, 
   UpdateUserSchema,
@@ -45,7 +45,7 @@ export class UserService {
     
     try {
       // Validate input
-      const validatedData = CreateUserSchema.parse({
+      CreateUserSchema.parse({
         ...userData,
         password: undefined // Remove password from validation as it's handled separately
       });
@@ -220,7 +220,7 @@ export class UserService {
 
     // Get total count
     const totalResult = await query.clone().count('* as count').first();
-    const total = parseInt(totalResult?.count as string || '0');
+    const total = parseInt(totalResult?.['count'] as string || '0');
 
     // Get paginated results
     const users = await query

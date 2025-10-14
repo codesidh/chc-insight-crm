@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { Knex } from 'knex';
-import { User, UserRole, Permission, UserContext } from '../types';
-import { LoginCredentialsSchema, UserContextSchema } from '../types/validation-schemas';
+import { Permission, UserContext } from '../types';
+import { LoginCredentialsSchema } from '../types/validation-schemas';
 import config from '../config/environment';
 
 export interface LoginCredentials {
@@ -226,7 +226,7 @@ export class AuthService {
       sessionId: this.generateSessionId()
     };
 
-    return UserContextSchema.parse(userContext);
+    return userContext;
   }
 
   /**
@@ -247,16 +247,24 @@ export class AuthService {
       type: 'refresh'
     };
 
+    const accessTokenOptions: SignOptions = {
+      expiresIn: config.jwt.expiresIn as any
+    };
+
+    const refreshTokenOptions: SignOptions = {
+      expiresIn: config.jwt.refreshExpiresIn as any
+    };
+
     const accessToken = jwt.sign(
       accessTokenPayload,
       config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      accessTokenOptions
     );
 
     const refreshToken = jwt.sign(
       refreshTokenPayload,
       config.jwt.refreshSecret,
-      { expiresIn: config.jwt.refreshExpiresIn }
+      refreshTokenOptions
     );
 
     return {
@@ -278,7 +286,7 @@ export class AuthService {
    */
   private parseExpirationTime(expiresIn: string): number {
     const match = expiresIn.match(/^(\d+)([smhd])$/);
-    if (!match) return 3600; // Default 1 hour
+    if (!match || !match[1]) return 3600; // Default 1 hour
 
     const value = parseInt(match[1]);
     const unit = match[2];

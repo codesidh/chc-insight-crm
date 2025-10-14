@@ -10,25 +10,20 @@
  * Requirements: 1.1, 1.2, 1.6
  */
 
-import { Knex } from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Question,
   QuestionType,
-  QuestionOption,
   ValidationRule,
   ConditionalRule,
   FormTemplate,
-  ResponseData,
   ApiResponse
 } from '../types';
 import {
   QuestionSchema,
   QuestionOptionSchema,
-  ValidationRuleSchema,
   ConditionalRuleSchema
 } from '../types/validation-schemas';
-import { DatabaseService } from './database.service';
 import { FormHierarchyService } from './form-hierarchy.service';
 
 export interface FormPreview {
@@ -53,11 +48,9 @@ export interface QuestionLibraryItem {
 }
 
 export class FormBuilderService {
-  private db: Knex;
   private formHierarchyService: FormHierarchyService;
 
   constructor() {
-    this.db = DatabaseService.getInstance().getConnection();
     this.formHierarchyService = new FormHierarchyService();
   }
 
@@ -197,8 +190,7 @@ export class FormBuilderService {
       }
 
       const template = templateResult.data;
-      const templateData = JSON.parse(template.template_data || '{}');
-      const currentQuestions = templateData.questions || [];
+      const currentQuestions = template.questions || [];
 
       // Add new question
       const updatedQuestions = [...currentQuestions, validatedQuestion];
@@ -212,7 +204,10 @@ export class FormBuilderService {
       );
 
       if (!updateResult.success) {
-        return updateResult;
+        return {
+          success: false,
+          error: updateResult.error
+        };
       }
 
       return {
@@ -256,8 +251,7 @@ export class FormBuilderService {
       }
 
       const template = templateResult.data;
-      const templateData = JSON.parse(template.template_data || '{}');
-      const currentQuestions = templateData.questions || [];
+      const currentQuestions = template.questions || [];
 
       // Find and update question
       const questionIndex = currentQuestions.findIndex((q: Question) => q.id === questionId);
@@ -289,7 +283,10 @@ export class FormBuilderService {
       );
 
       if (!updateResult.success) {
-        return updateResult;
+        return {
+          success: false,
+          error: updateResult.error
+        };
       }
 
       return {
@@ -332,8 +329,7 @@ export class FormBuilderService {
       }
 
       const template = templateResult.data;
-      const templateData = JSON.parse(template.template_data || '{}');
-      const currentQuestions = templateData.questions || [];
+      const currentQuestions = template.questions || [];
 
       // Remove question
       const updatedQuestions = currentQuestions.filter((q: Question) => q.id !== questionId);
@@ -357,7 +353,10 @@ export class FormBuilderService {
       );
 
       if (!updateResult.success) {
-        return updateResult;
+        return {
+          success: false,
+          error: updateResult.error
+        };
       }
 
       return {
@@ -399,8 +398,7 @@ export class FormBuilderService {
       }
 
       const template = templateResult.data;
-      const templateData = JSON.parse(template.template_data || '{}');
-      const currentQuestions = templateData.questions || [];
+      const currentQuestions = template.questions || [];
 
       // Create order map
       const orderMap = new Map(questionOrder.map(item => [item.questionId, item.order]));
@@ -422,7 +420,10 @@ export class FormBuilderService {
       );
 
       if (!updateResult.success) {
-        return updateResult;
+        return {
+          success: false,
+          error: updateResult.error
+        };
       }
 
       return {
@@ -475,8 +476,8 @@ export class FormBuilderService {
         sourceTemplateId,
         tenantId,
         sourceTemplate.name, // Same name for versioning
-        sourceTemplate.type_id,
-        userId || sourceTemplate.created_by
+        sourceTemplate.typeId,
+        userId || sourceTemplate.createdBy
       );
 
       if (!copyResult.success) {
@@ -493,7 +494,7 @@ export class FormBuilderService {
               `${sourceTemplate.description || ''}\n\nVersion Notes: ${versionNotes}`.trim() :
               sourceTemplate.description
           },
-          userId || sourceTemplate.created_by
+          userId || sourceTemplate.createdBy
         );
 
         if (updateResult.success) {
@@ -583,8 +584,7 @@ export class FormBuilderService {
       }
 
       const template = templateResult.data;
-      const templateData = JSON.parse(template.template_data || '{}');
-      const questions = templateData.questions || [];
+      const questions = template.questions || [];
 
       // Calculate preview metrics
       const totalQuestions = questions.length;
@@ -719,8 +719,7 @@ export class FormBuilderService {
       }
 
       const template = templateResult.data;
-      const templateData = JSON.parse(template.template_data || '{}');
-      const questions = templateData.questions || [];
+      const questions = template.questions || [];
       const questionIds = new Set(questions.map((q: Question) => q.id));
 
       const errors: string[] = [];

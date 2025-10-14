@@ -18,10 +18,36 @@ import {
   runSeeds,
   closeKnexConnection,
   getMigrationStatus,
+  db,
 } from '../config/knex';
 
 export class DatabaseService {
   private static initialized = false;
+  private static instance: DatabaseService;
+
+  /**
+   * Get singleton instance of DatabaseService
+   */
+  static getInstance(): DatabaseService {
+    if (!DatabaseService.instance) {
+      DatabaseService.instance = new DatabaseService();
+    }
+    return DatabaseService.instance;
+  }
+
+  /**
+   * Get Knex database connection
+   */
+  getConnection() {
+    return db;
+  }
+
+  /**
+   * Get Knex instance (static method)
+   */
+  static getKnexInstance() {
+    return db;
+  }
 
   /**
    * Initialize all database connections (PostgreSQL and Redis)

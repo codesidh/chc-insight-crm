@@ -54,8 +54,8 @@ export class FormHierarchyController {
 
       // Parse filters
       const filters = {
-        isActive: req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
-        name: req.query.name as string
+        isActive: req.query['isActive'] === 'true' ? true : req.query['isActive'] === 'false' ? false : undefined,
+        name: req.query['name'] as string
       };
 
       const result = await this.formHierarchyService.getFormCategories(tenantId, pagination, filters);
@@ -90,6 +90,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Tenant ID required' }
+        });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Category ID is required' }
         });
         return;
       }
@@ -206,6 +214,14 @@ export class FormHierarchyController {
         return;
       }
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Category ID is required' }
+        });
+        return;
+      }
+
       const result = await this.formHierarchyService.updateFormCategory(id, tenantId, validationResult.data, userId);
 
       if (result.success) {
@@ -240,6 +256,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+        });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Category ID is required' }
         });
         return;
       }
@@ -291,9 +315,17 @@ export class FormHierarchyController {
 
       // Parse filters
       const filters = {
-        isActive: req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
-        name: req.query.name as string
+        isActive: req.query['isActive'] === 'true' ? true : req.query['isActive'] === 'false' ? false : undefined,
+        name: req.query['name'] as string
       };
+
+      if (!categoryId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Category ID is required' }
+        });
+        return;
+      }
 
       const result = await this.formHierarchyService.getFormTypes(categoryId, tenantId, pagination, filters);
 
@@ -327,6 +359,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Tenant ID required' }
+        });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Form type ID is required' }
         });
         return;
       }
@@ -446,6 +486,14 @@ export class FormHierarchyController {
         return;
       }
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Form type ID is required' }
+        });
+        return;
+      }
+
       const result = await this.formHierarchyService.updateFormType(id, tenantId, validationResult.data, userId);
 
       if (result.success) {
@@ -480,6 +528,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+        });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Form type ID is required' }
         });
         return;
       }
@@ -531,10 +587,18 @@ export class FormHierarchyController {
 
       // Parse filters
       const filters = {
-        isActive: req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined,
-        name: req.query.name as string,
-        version: req.query.version ? parseInt(req.query.version as string) : undefined
+        isActive: req.query['isActive'] === 'true' ? true : req.query['isActive'] === 'false' ? false : undefined,
+        name: req.query['name'] as string,
+        version: req.query['version'] ? parseInt(req.query['version'] as string) : undefined
       };
+
+      if (!typeId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Form type ID is required' }
+        });
+        return;
+      }
 
       const result = await this.formHierarchyService.getFormTemplates(typeId, tenantId, pagination, filters);
 
@@ -572,6 +636,14 @@ export class FormHierarchyController {
         return;
       }
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
+
       const result = await this.formHierarchyService.getFormTemplateById(id, tenantId);
 
       if (result.success) {
@@ -605,6 +677,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Tenant ID required' }
+        });
+        return;
+      }
+
+      if (!typeId || !name) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PARAMS', message: 'Type ID and template name are required' }
         });
         return;
       }
@@ -706,6 +786,14 @@ export class FormHierarchyController {
         return;
       }
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
+
       const result = await this.formHierarchyService.copyFormTemplate(id, tenantId, newName, targetTypeId, userId);
 
       if (result.success) {
@@ -762,6 +850,14 @@ export class FormHierarchyController {
         return;
       }
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
+
       const result = await this.formHierarchyService.updateFormTemplate(id, tenantId, validationResult.data, userId);
 
       if (result.success) {
@@ -796,6 +892,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+        });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Template ID is required' }
         });
         return;
       }
@@ -849,6 +953,14 @@ export class FormHierarchyController {
       const filterResult = FormInstanceFilterSchema.safeParse(req.query);
       const filters = filterResult.success ? filterResult.data : {};
 
+      if (!templateId) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Template ID is required' }
+        });
+        return;
+      }
+
       const result = await this.formHierarchyService.getFormInstances(templateId, tenantId, pagination, filters);
 
       if (result.success) {
@@ -881,6 +993,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Tenant ID required' }
+        });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Instance ID is required' }
         });
         return;
       }
@@ -1000,6 +1120,14 @@ export class FormHierarchyController {
         return;
       }
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Instance ID is required' }
+        });
+        return;
+      }
+
       const result = await this.formHierarchyService.updateFormInstance(id, tenantId, validationResult.data, userId);
 
       if (result.success) {
@@ -1034,6 +1162,14 @@ export class FormHierarchyController {
         res.status(401).json({
           success: false,
           error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+        });
+        return;
+      }
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Instance ID is required' }
         });
         return;
       }

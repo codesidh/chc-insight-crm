@@ -69,7 +69,7 @@ export class ServiceCoordinatorService {
     
     try {
       // Validate input
-      const validatedData = CreateServiceCoordinatorSchema.parse({
+      CreateServiceCoordinatorSchema.parse({
         tenantId: data.tenantId,
         scid: data.scid,
         firstName: data.firstName,
