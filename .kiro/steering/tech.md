@@ -87,9 +87,41 @@ Both frontend and backend use consistent path aliases:
 - **State Management**: For dashboard state
     - add: TanStack Query v5 - Server state management, caching for dashboard data 
     - Zustand (optional) - Global client state if needed (filters, UI preferences)
-**Always check shadcn/ui registry first.**
+**CRITICAL: ALWAYS check shadcn/ui registry first using MCP tools before suggesting any UI components.**
+**PROCESS: 1) Search registry 2) View component details 3) Get examples 4) Only then implement**
+- References: 
+    - Dashboard: npx shadcn@latest add dashboard-01
+    - Login: npx shadcn@latest add login-01
+    - Signup: npx shadcn@latest add signup-01
+    - navigation or sidebar: npx shadcn@latest add sidebar-08
+    - OTP: npx shadcn@latest add otp-01
+    - Calendar: npx shadcn@latest add calendar-04
+    - Themeing: https://ui.shadcn.com/docs/theming
+    - Dark mode: https://ui.shadcn.com/docs/dark-mode/next
+    - Charts:  
+        -- Area: https://ui.shadcn.com/charts/area#charts
+        -- Bar: https://ui.shadcn.com/charts/bar#charts
+        -- Line: https://ui.shadcn.com/charts/line#charts
+        -- Pie: https://ui.shadcn.com/charts/pie#charts
+        -- Radar: https://ui.shadcn.com/charts/radar#charts
+        -- Radial: https://ui.shadcn.com/charts/radial#charts
+        -- Tooltips: https://ui.shadcn.com/charts/tooltip#charts
+
 **Never create custom UI components when shadcn equivalents exist.**
 **Remove unused import**
+
+## Rule Enforcement
+
+**MANDATORY WORKFLOW for UI components:**
+1. Use `mcp_shadcn_search_items_in_registries` to find components
+2. Use `mcp_shadcn_view_items_in_registries` to see implementation details  
+3. Use `mcp_shadcn_get_item_examples_from_registries` to get usage examples
+4. Use `mcp_shadcn_get_add_command_for_items` to get install commands
+5. Only if NO shadcn component exists, create custom component
+
+**VIOLATION CONSEQUENCES:**
+- If Kiro suggests custom components without checking registry first, user should remind: "Check shadcn registry first"
+- If Kiro doesn't follow the 5-step workflow above, user should say: "Follow the mandatory UI workflow"
 
 ## Code Quality
 
