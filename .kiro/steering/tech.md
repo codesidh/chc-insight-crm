@@ -100,4 +100,4 @@ Both frontend and backend use consistent path aliases:
 
 ## Document Standards 
 
-- Except for documents under .kiro folders move all other .md file to frontend/doc folder or backend/doc folder based on the implementation.
+- Except for documents under .kiro folders move all other .md file to frontend/docs folder or backend/docs folder based on the implementation.
