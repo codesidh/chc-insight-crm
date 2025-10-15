@@ -1,3 +1,5 @@
+"use client"
+
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,16 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { 
   Users, 
-  Plus, 
   Search, 
   Filter,
-  MoreHorizontal,
   Phone,
   Mail,
   MapPin,
-  Calendar,
   Activity,
-  AlertCircle
+  AlertCircle,
+  Database
 } from 'lucide-react';
 
 export default function MembersPage() {
@@ -27,78 +27,78 @@ export default function MembersPage() {
           {/* Header Section */}
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight">Member Management</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Member Lookup</h1>
               <p className="text-muted-foreground text-lg">
-                Manage member information, track care plans, and monitor engagement.
+                Search and pre-populate member data for form instances.
               </p>
             </div>
             <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Member
+              <Database className="h-4 w-4" />
+              Staging Data
             </Button>
           </div>
 
-          {/* Member Stats */}
+          {/* MVP Member Stats */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Members</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Staging Records</CardTitle>
+                <Database className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2,847</div>
+                <div className="text-2xl font-bold">1,847</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">+180</span> this month
+                  Available for lookup
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Members</CardTitle>
+                <CardTitle className="text-sm font-medium">Recent Searches</CardTitle>
+                <Search className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">142</div>
+                <p className="text-xs text-muted-foreground">
+                  <span className="text-green-600">+23</span> today
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pre-populated Forms</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2,654</div>
+                <div className="text-2xl font-bold">89</div>
                 <p className="text-xs text-muted-foreground">
-                  93.2% of total members
+                  This week
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
+                <CardTitle className="text-sm font-medium">Data Quality</CardTitle>
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">47</div>
+                <div className="text-2xl font-bold">98.2%</div>
                 <p className="text-xs text-muted-foreground">
-                  Require care plan updates
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">New This Week</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">23</div>
-                <p className="text-xs text-muted-foreground">
-                  New member enrollments
+                  Complete records
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Search and Filters */}
+          {/* MVP Member Search */}
           <Card>
             <CardHeader>
-              <CardTitle>Member Directory</CardTitle>
+              <CardTitle>Member Search & Lookup</CardTitle>
               <CardDescription>
-                Search and filter members by various criteria
+                Search staging data to pre-populate form instances
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -106,13 +106,16 @@ export default function MembersPage() {
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="Search members by name, ID, or phone..." 
+                    placeholder="Type to search members (name, ID, phone, email)..." 
                     className="pl-10"
                   />
                 </div>
                 <Button variant="outline" className="gap-2">
                   <Filter className="h-4 w-4" />
                   Filters
+                </Button>
+                <Button>
+                  Search
                 </Button>
               </div>
 
@@ -147,13 +150,13 @@ export default function MembersPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <Badge variant="default">Active</Badge>
+                      <Badge variant="default">Available</Badge>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Enrolled: Jan 15, 2024
+                        Last updated: Dec 10, 2024
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button size="sm">
+                      Select
                     </Button>
                   </div>
                 </div>
@@ -187,13 +190,13 @@ export default function MembersPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <Badge variant="secondary">Pending Review</Badge>
+                      <Badge variant="default">Available</Badge>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Enrolled: Mar 8, 2024
+                        Last updated: Dec 8, 2024
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button size="sm">
+                      Select
                     </Button>
                   </div>
                 </div>
@@ -227,13 +230,13 @@ export default function MembersPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <Badge variant="default">Active</Badge>
+                      <Badge variant="default">Available</Badge>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Enrolled: Feb 22, 2024
+                        Last updated: Dec 5, 2024
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button size="sm">
+                      Select
                     </Button>
                   </div>
                 </div>
@@ -241,18 +244,18 @@ export default function MembersPage() {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
+          {/* MVP Quick Actions */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card className="transition-all hover:shadow-lg cursor-pointer">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <Plus className="h-5 w-5 text-primary" />
+                    <Search className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Add New Member</CardTitle>
+                    <CardTitle className="text-lg">Advanced Search</CardTitle>
                     <CardDescription>
-                      Enroll a new member in the system
+                      Search with multiple criteria
                     </CardDescription>
                   </div>
                 </div>
@@ -263,12 +266,12 @@ export default function MembersPage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-                    <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Bulk Import</CardTitle>
+                    <CardTitle className="text-lg">Staging Data</CardTitle>
                     <CardDescription>
-                      Import members from CSV or Excel
+                      Manage staging data sources
                     </CardDescription>
                   </div>
                 </div>
@@ -278,13 +281,13 @@ export default function MembersPage() {
             <Card className="transition-all hover:shadow-lg cursor-pointer">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900">
-                    <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
+                    <Activity className="h-5 w-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Review Queue</CardTitle>
+                    <CardTitle className="text-lg">Search History</CardTitle>
                     <CardDescription>
-                      Members requiring attention
+                      View recent search activity
                     </CardDescription>
                   </div>
                 </div>

@@ -1,3 +1,5 @@
+"use client"
+
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,17 +10,13 @@ import {
   Eye, 
   Edit, 
   Copy,
-  MoreHorizontal,
-  Calendar,
-  Users,
-  CheckCircle,
-  Clock
+  FolderTree,
+  Settings,
+  Play
 } from 'lucide-react';
-import { getSurveysData } from '@/lib/app-data';
+import Link from 'next/link';
 
 export default function SurveysPage() {
-  const surveysData = getSurveysData();
-  
   return (
     <AppLayout headerTitle="Surveys">
       <div className="flex flex-1 flex-col">
@@ -28,33 +26,59 @@ export default function SurveysPage() {
           {/* Header Section */}
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight">{surveysData.pageInfo.title}</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Form Management</h1>
               <p className="text-muted-foreground text-lg">
-                {surveysData.pageInfo.description}
+                Manage hierarchical forms: Categories → Types → Templates → Instances
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" asChild>
-                <a href="/surveys/form-builder">
+              <Link href="/surveys/form-builder">
+                <Button variant="outline">
                   Form Builder
-                </a>
-              </Button>
+                </Button>
+              </Link>
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                Create Survey
+                Create Form
               </Button>
             </div>
           </div>
 
-          {/* Survey Stats */}
+          {/* MVP Form Hierarchy Stats */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Surveys</CardTitle>
+                <CardTitle className="text-sm font-medium">Categories</CardTitle>
+                <FolderTree className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">2</div>
+                <p className="text-xs text-muted-foreground">
+                  Cases & Assessments
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Form Types</CardTitle>
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">24</div>
+                <div className="text-2xl font-bold">8</div>
+                <p className="text-xs text-muted-foreground">
+                  Active form types
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Templates</CardTitle>
+                <Settings className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">12</div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-600">+3</span> this month
                 </p>
@@ -63,70 +87,43 @@ export default function SurveysPage() {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Surveys</CardTitle>
-                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Instances</CardTitle>
+                <Play className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12</div>
+                <div className="text-2xl font-bold">247</div>
                 <p className="text-xs text-muted-foreground">
-                  Currently deployed
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Responses</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">1,847</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">+127</span> this week
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg Completion</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">8.5m</div>
-                <p className="text-xs text-muted-foreground">
-                  Average completion time
+                  <span className="text-green-600">+23</span> this week
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Survey List */}
+          {/* Form Categories */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Surveys</CardTitle>
+              <CardTitle>Form Categories</CardTitle>
               <CardDescription>
-                Manage your survey templates and deployments
+                Navigate the hierarchical form structure
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Survey Item */}
+                {/* Cases Category */}
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <FileText className="h-5 w-5 text-primary" />
+                      <FolderTree className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-medium">Member Satisfaction Q4 2024</h4>
+                      <h4 className="font-medium">Cases</h4>
                       <p className="text-sm text-muted-foreground">
-                        Healthcare satisfaction assessment • 15 questions
+                        Case management and tracking forms
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="default">Active</Badge>
-                        <span className="text-xs text-muted-foreground">
-                          Created Dec 1, 2024
-                        </span>
+                        <Badge variant="default">4 Types</Badge>
+                        <Badge variant="secondary">7 Templates</Badge>
+                        <Badge variant="outline">142 Instances</Badge>
                       </div>
                     </div>
                   </div>
@@ -137,31 +134,24 @@ export default function SurveysPage() {
                     <Button variant="ghost" size="sm">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm">
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
 
-                {/* Survey Item */}
+                {/* Assessments Category */}
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10">
-                      <FileText className="h-5 w-5 text-secondary-foreground" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                      <FolderTree className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <h4 className="font-medium">Provider Quality Assessment</h4>
+                      <h4 className="font-medium">Assessments</h4>
                       <p className="text-sm text-muted-foreground">
-                        Annual provider evaluation • 28 questions
+                        Member and provider assessment forms
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="secondary">Draft</Badge>
-                        <span className="text-xs text-muted-foreground">
-                          Created Nov 28, 2024
-                        </span>
+                        <Badge variant="default">4 Types</Badge>
+                        <Badge variant="secondary">5 Templates</Badge>
+                        <Badge variant="outline">105 Instances</Badge>
                       </div>
                     </div>
                   </div>
@@ -171,46 +161,6 @@ export default function SurveysPage() {
                     </Button>
                     <Button variant="ghost" size="sm">
                       <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Survey Item */}
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
-                      <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Care Plan Effectiveness Survey</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Member care plan feedback • 12 questions
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-green-600 border-green-600">
-                          Completed
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          Completed Nov 15, 2024
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -218,34 +168,111 @@ export default function SurveysPage() {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="transition-all hover:shadow-lg cursor-pointer">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <Plus className="h-5 w-5 text-primary" />
+          {/* Recent Form Templates */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Form Templates</CardTitle>
+              <CardDescription>
+                Recently created and modified form templates
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
+                      <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Member Satisfaction Survey</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Cases → Member Feedback → Satisfaction Template
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="default">Active</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          15 questions • Created Dec 1, 2024
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">Create New Survey</CardTitle>
-                    <CardDescription>
-                      Start with a template or build from scratch
-                    </CardDescription>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Copy className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </CardHeader>
-            </Card>
+
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900">
+                      <FileText className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Provider Quality Assessment</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Assessments → Provider Review → Quality Template
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary">Draft</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          28 questions • Created Nov 28, 2024
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* MVP Quick Actions */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Link href="/surveys/form-builder">
+              <Card className="transition-all hover:shadow-lg cursor-pointer">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <Settings className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Form Builder</CardTitle>
+                      <CardDescription>
+                        Create and edit form templates
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
 
             <Card className="transition-all hover:shadow-lg cursor-pointer">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-                    <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Schedule Deployment</CardTitle>
+                    <CardTitle className="text-lg">Create Instance</CardTitle>
                     <CardDescription>
-                      Plan survey releases and campaigns
+                      Start a new form instance
                     </CardDescription>
                   </div>
                 </div>
@@ -256,12 +283,12 @@ export default function SurveysPage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
-                    <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <FolderTree className="h-5 w-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Survey Templates</CardTitle>
+                    <CardTitle className="text-lg">Manage Hierarchy</CardTitle>
                     <CardDescription>
-                      Browse pre-built survey templates
+                      Organize categories and types
                     </CardDescription>
                   </div>
                 </div>

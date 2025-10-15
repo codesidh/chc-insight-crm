@@ -1,15 +1,22 @@
-import { Button } from '@/components/ui/button';
+"use client"
+
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AppLayout } from '@/components/layout/app-layout';
-import { Activity, CheckCircle, BarChart3 } from 'lucide-react';
-import { getIcon } from '@/lib/icon-utils';
-import { getDashboardData } from '@/lib/app-data';
+import { 
+  FileText, 
+  Users, 
+  Building2, 
+  CheckCircle, 
+  Clock,
+  Plus,
+  BarChart3,
+  Activity
+} from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const dashboardData = getDashboardData();
-  
   return (
     <AppLayout headerTitle="Dashboard">
       <div className="flex flex-1 flex-col">
@@ -19,177 +26,211 @@ export default function DashboardPage() {
               {/* Welcome Section */}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tight">{dashboardData.welcomeMessage.title}</h1>
+                  <h1 className="text-3xl font-bold tracking-tight">CHC Insight CRM Dashboard</h1>
                   <p className="text-muted-foreground text-lg">
-                    {dashboardData.welcomeMessage.description}
+                    Manage forms, track member engagement, and monitor system performance.
                   </p>
                 </div>
-                
-                {/* Executive Dashboard Link */}
-                <Card className="border-primary/20 bg-primary/5">
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                        <BarChart3 className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">Executive Dashboard</h3>
-                        <p className="text-sm text-muted-foreground">
-                          View comprehensive analytics and form completion metrics
-                        </p>
-                      </div>
-                    </div>
-                    <Link href="/dashboard/executive">
-                      <Button>
-                        View Analytics
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
               </div>
               
-              {/* Quick Stats */}
+              {/* MVP Core Metrics */}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {dashboardData.stats.map((stat) => {
-                  const IconComponent = getIcon(stat.icon);
-
-                  return (
-                    <Card key={stat.id}>
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                        <IconComponent className="h-4 w-4 text-muted-foreground" />
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-muted-foreground">
-                          {stat.change && (
-                            <span className={stat.changeType === 'positive' ? 'text-green-600' : 'text-yellow-600'}>
-                              {stat.change}
-                            </span>
-                          )} {stat.changeLabel}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Form Templates</CardTitle>
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">12</div>
+                    <p className="text-xs text-muted-foreground">
+                      Active templates
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Form Instances</CardTitle>
+                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">247</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-600">+23</span> this week
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Members</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">1,847</div>
+                    <p className="text-xs text-muted-foreground">
+                      Active members
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Providers</CardTitle>
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">342</div>
+                    <p className="text-xs text-muted-foreground">
+                      In network
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
 
-              {/* Feature Cards */}
+              {/* MVP Quick Actions */}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {dashboardData.featureCards.map((card) => {
-                  const IconComponent = getIcon(card.icon);
-
-                  return (
-                    <Card key={card.id} className="transition-all hover:shadow-lg">
-                      <CardHeader>
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                            <IconComponent className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg">{card.title}</CardTitle>
-                            <CardDescription>
-                              {card.description}
-                            </CardDescription>
-                          </div>
+                <Link href="/surveys/form-builder">
+                  <Card className="transition-all hover:shadow-lg cursor-pointer">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                          <FileText className="h-5 w-5 text-primary" />
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <Button variant="outline" size="sm" className="w-full">
-                          {card.buttonText}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                        <div>
+                          <CardTitle className="text-lg">Form Builder</CardTitle>
+                          <CardDescription>
+                            Create and manage form templates
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                </Link>
+
+                <Link href="/surveys">
+                  <Card className="transition-all hover:shadow-lg cursor-pointer">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                          <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">Create Survey</CardTitle>
+                          <CardDescription>
+                            Start a new form instance
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                </Link>
+
+                <Link href="/members">
+                  <Card className="transition-all hover:shadow-lg cursor-pointer">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
+                          <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">Member Lookup</CardTitle>
+                          <CardDescription>
+                            Search and manage members
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                </Link>
               </div>
 
-              {/* Recent Activity & Status */}
-              <div className="grid gap-4 lg:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Activity className="h-5 w-5" />
-                      Recent Activity
-                    </CardTitle>
-                    <CardDescription>
-                      Latest system activities and updates
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {dashboardData.recentActivity.map((activity) => {
-                      const IconComponent = getIcon(activity.icon);
-
-                      const colorClasses = {
-                        green: "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400",
-                        blue: "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400",
-                        yellow: "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400",
-                        red: "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
-                      }[activity.iconColor] || "bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400";
-
-                      return (
-                        <div key={activity.id} className="flex items-center gap-3">
-                          <div className={`flex h-8 w-8 items-center justify-center rounded-full ${colorClasses}`}>
-                            <IconComponent className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{activity.title}</p>
-                            <p className="text-xs text-muted-foreground">{activity.time}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5" />
-                      System Status
-                    </CardTitle>
-                    <CardDescription>
-                      Current development and deployment status
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {dashboardData.systemStatus.map((status) => {
-                      const IconComponent = getIcon(status.icon);
-
-                      return (
-                        <div key={status.id} className="flex items-center justify-between">
-                          <span className="font-medium">{status.title}</span>
-                          <Badge variant={status.variant as any} className="gap-1">
-                            <IconComponent className="h-3 w-3" />
-                            {status.status}
-                          </Badge>
-                        </div>
-                      );
-                    })}
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Quick Actions */}
+              {/* Recent Activity */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5" />
+                    Recent Activity
+                  </CardTitle>
                   <CardDescription>
-                    Common tasks and shortcuts for efficient workflow management
+                    Latest form submissions and system updates
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {dashboardData.quickActions.map((action) => {
-                      const IconComponent = getIcon(action.icon);
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Form instance completed</p>
+                      <p className="text-xs text-muted-foreground">Member Assessment - 2 minutes ago</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
+                      <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">New form template created</p>
+                      <p className="text-xs text-muted-foreground">Provider Quality Survey - 15 minutes ago</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900">
+                      <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">Workflow approval pending</p>
+                      <p className="text-xs text-muted-foreground">Survey deployment - 1 hour ago</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-                      return (
-                        <Button key={action.id} variant="outline" className="h-auto flex-col gap-2 p-4">
-                          <IconComponent className="h-6 w-6" />
-                          <span className="text-sm">{action.title}</span>
-                        </Button>
-                      );
-                    })}
+              {/* System Status */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    MVP System Status
+                  </CardTitle>
+                  <CardDescription>
+                    Current status of MVP components
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Form Hierarchy</span>
+                    <Badge variant="default" className="gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Active
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Form Builder</span>
+                    <Badge variant="default" className="gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Active
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Member/Provider Lookup</span>
+                    <Badge variant="default" className="gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Active
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Basic Workflows</span>
+                    <Badge variant="default" className="gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Active
+                    </Badge>
                   </div>
                 </CardContent>
               </Card>
