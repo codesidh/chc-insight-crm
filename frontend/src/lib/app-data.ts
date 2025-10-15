@@ -1,6 +1,5 @@
 // Utility functions to load and process application data from JSON files
 
-import analyticsData from "@/data/app/analytics_data.json"
 import dashboardData from "@/data/app/dashboard_data.json"
 import membersData from "@/data/app/members_data.json"
 import providersData from "@/data/app/providers_data.json"
@@ -32,13 +31,9 @@ export const getSurveysData = () => surveysData
 // Workflows data exports
 export const getWorkflowsData = () => workflowsData
 
-// Analytics data exports
-export const getAnalyticsData = () => analyticsData
-
 // Type definitions for better TypeScript support
 export type DashboardDataType = typeof dashboardData
 export type MembersDataType = typeof membersData
 export type ProvidersDataType = typeof providersData
 export type SurveysDataType = typeof surveysData
 export type WorkflowsDataType = typeof workflowsData
-export type AnalyticsDataType = typeof analyticsData

@@ -1,12 +1,3 @@
-// Chart Examples
-export {
-  ComplianceAreaChart,
-  SurveyTypePieChart,
-  ProductivityBarChart,
-  ComplianceLineChart,
-  DashboardChartsExample,
-} from './chart-examples'
-
 // Interactive Chart Example
 export {
   ChartAreaInteractive,
@@ -37,18 +28,7 @@ export {
   NavigationShowcase,
 } from './navigation-examples'
 
-// Calendars Examples
+// Survey List Example
 export {
-  CalendarsExample,
-  CalendarsShowcase,
-} from './calendars-example'
-
-// Calendar01 Example
-export {
-  Calendar01,
-} from './calendar01-example'
-
-// Calendar04 Example
-export {
-  Calendar04,
-} from './calendar04-example'
+  SurveyListExample,
+} from './survey-list-example'

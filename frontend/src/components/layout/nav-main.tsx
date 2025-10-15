@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
-  BarChart3, 
   FileText, 
   Home, 
   Users, 
@@ -27,7 +26,6 @@ const iconMap = {
   "/members": Users,
   "/providers": Building2,
   "/workflows": Workflow,
-  "/analytics": BarChart3,
 }
 
 export function NavMain({

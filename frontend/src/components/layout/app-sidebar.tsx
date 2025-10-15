@@ -45,44 +45,22 @@ const data = {
       title: "Workflows",
       url: "/workflows",
     },
-    {
-      title: "Analytics",
-      url: "/analytics",
-    },
   ],
   navSecondary: [
     {
-      title: "Examples",
-      url: "/examples",
+      title: "Reports",
+      url: "/reports",
     },
     {
       title: "Settings",
       url: "/settings",
     },
     {
-      title: "Get Help",
-      url: "/help",
-    },
-    {
-      title: "Search",
-      url: "/search",
+      title: "Examples",
+      url: "/examples",
     },
   ],
-  documents: [
-    {
-      title: "Data Management",
-      url: "/data-management",
-    },
-    {
-      title: "Reports",
-      url: "/reports",
-    },
-    {
-      title: "Word Assistant",
-      url: "/word-assistant",
-    },
-  ],
-
+  documents: [],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
