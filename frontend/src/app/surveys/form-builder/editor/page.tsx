@@ -10,7 +10,6 @@ export default function FormBuilderEditorPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const templateId = searchParams.get('templateId');
-  const typeId = searchParams.get('typeId');
   
   const [template, setTemplate] = useState<FormTemplate | undefined>();
   const [isLoading, setIsLoading] = useState(true);
@@ -20,10 +19,17 @@ export default function FormBuilderEditorPage() {
     if (templateId) {
       const existingTemplate = formHierarchyData.templates.find(
         t => t.id === templateId
-      ) as FormTemplate;
+      );
       
       if (existingTemplate) {
-        setTemplate(existingTemplate);
+        // Convert string dates to Date objects
+        const convertedTemplate: FormTemplate = {
+          ...existingTemplate,
+          effectiveDate: new Date(existingTemplate.effectiveDate),
+          expirationDate: existingTemplate.expirationDate ? new Date(existingTemplate.expirationDate) : undefined
+        } as FormTemplate;
+      
+        setTemplate(convertedTemplate);
       }
     }
     setIsLoading(false);
@@ -55,7 +61,7 @@ export default function FormBuilderEditorPage() {
 
   return (
     <FormBuilderInterface
-      template={template}
+      template={template || undefined}
       onSave={handleSave}
       onBack={handleBack}
     />

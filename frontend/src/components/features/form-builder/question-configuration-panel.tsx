@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,13 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { 
   Form,
   FormControl,
@@ -36,20 +29,9 @@ import {
 } from 'lucide-react';
 import { Question, QuestionType, QuestionOption } from '@/types';
 
-// Validation schema for question configuration
-const questionConfigSchema = z.object({
-  text: z.string().min(1, 'Question text is required'),
-  required: z.boolean().default(false),
-  helpText: z.string().optional(),
-  defaultValue: z.string().optional(),
-  options: z.array(z.object({
-    id: z.string(),
-    label: z.string().min(1, 'Option label is required'),
-    value: z.string().min(1, 'Option value is required')
-  })).optional()
-});
 
-type QuestionConfigFormData = z.infer<typeof questionConfigSchema>;
+
+
 
 interface QuestionConfigurationPanelProps {
   question: Question | null;
@@ -64,8 +46,7 @@ export function QuestionConfigurationPanel({
 }: QuestionConfigurationPanelProps) {
   const [options, setOptions] = useState<QuestionOption[]>([]);
 
-  const form = useForm<QuestionConfigFormData>({
-    resolver: zodResolver(questionConfigSchema),
+  const form = useForm({
     defaultValues: {
       text: '',
       required: false,
@@ -82,24 +63,26 @@ export function QuestionConfigurationPanel({
         text: question.text,
         required: question.required,
         helpText: question.helpText || '',
-        defaultValue: question.defaultValue || '',
-        options: question.options || []
+        defaultValue: question.defaultValue || ''
       });
       setOptions(question.options || []);
     }
   }, [question, form]);
 
-  const handleSave = (data: QuestionConfigFormData) => {
+  const handleSave = (data: any) => {
     if (!question) return;
 
     const updatedQuestion: Question = {
       ...question,
       text: data.text,
-      required: data.required,
+      required: data.required || false,
       helpText: data.helpText,
-      defaultValue: data.defaultValue,
-      options: needsOptions(question.type) ? options : undefined
+      defaultValue: data.defaultValue
     };
+
+    if (needsOptions(question.type)) {
+      updatedQuestion.options = options;
+    }
 
     onQuestionUpdate?.(updatedQuestion);
   };
@@ -125,8 +108,11 @@ export function QuestionConfigurationPanel({
 
   const updateOption = (index: number, field: 'label' | 'value', value: string) => {
     const updatedOptions = [...options];
-    updatedOptions[index] = { ...updatedOptions[index], [field]: value };
-    setOptions(updatedOptions);
+    const currentOption = updatedOptions[index];
+    if (currentOption) {
+      updatedOptions[index] = { ...currentOption, [field]: value };
+      setOptions(updatedOptions);
+    }
   };
 
   const removeOption = (index: number) => {
@@ -299,7 +285,7 @@ export function QuestionConfigurationPanel({
                   {options.length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">
                       <p>No options added yet.</p>
-                      <p className="text-sm">Click "Add Option" to create answer choices.</p>
+                      <p className="text-sm">Click &quot;Add Option&quot; to create answer choices.</p>
                     </div>
                   )}
                 </div>

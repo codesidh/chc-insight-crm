@@ -23,9 +23,24 @@ export function useFormHierarchy(): UseFormHierarchyReturn {
   const [selectedType, setSelectedType] = useState<FormType | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<FormTemplate | null>(null);
 
-  const categories = useMemo(() => formHierarchyData.categories as FormCategory[], []);
-  const types = useMemo(() => formHierarchyData.types as FormType[], []);
-  const templates = useMemo(() => formHierarchyData.templates as FormTemplate[], []);
+  const categories = useMemo(() => 
+    formHierarchyData.categories.map(c => ({
+      ...c,
+      createdAt: new Date(c.createdAt)
+    })) as FormCategory[], []);
+    
+  const types = useMemo(() => 
+    formHierarchyData.types.map(t => ({
+      ...t,
+      createdAt: new Date(t.createdAt)
+    })) as FormType[], []);
+    
+  const templates = useMemo(() => 
+    formHierarchyData.templates.map(t => ({
+      ...t,
+      effectiveDate: new Date(t.effectiveDate),
+      expirationDate: t.expirationDate ? new Date(t.expirationDate) : undefined
+    })) as FormTemplate[], []);
 
   const getTypesByCategory = (categoryId: string): FormType[] => {
     return types.filter(type => type.categoryId === categoryId && type.isActive);

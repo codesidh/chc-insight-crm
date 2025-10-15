@@ -33,10 +33,7 @@ export default function FormBuilderPage() {
     console.log('Selected template:', template);
   };
 
-  const handleCreateTemplate = (typeId: string) => {
-    // Navigate to form builder editor for new template
-    window.location.href = `/surveys/form-builder/editor?typeId=${typeId}`;
-  };
+
 
   const handleEditTemplate = (template: FormTemplate) => {
     setSelectedTemplate(template);
@@ -44,11 +41,7 @@ export default function FormBuilderPage() {
     window.location.href = `/surveys/form-builder/editor?templateId=${template.id}`;
   };
 
-  const handleViewTemplate = (template: FormTemplate) => {
-    setSelectedTemplate(template);
-    // TODO: Navigate to template preview
-    console.log('View template:', template);
-  };
+
 
   const handleCopyTemplate = (template: FormTemplate) => {
     // TODO: Implement template copying
@@ -170,7 +163,6 @@ export default function FormBuilderPage() {
                     <TabsContent value="hierarchy" className="mt-6">
                       <FormHierarchyNavigation
                         onTemplateSelect={handleTemplateSelect}
-                        onCreateTemplate={handleCreateTemplate}
                       />
                     </TabsContent>
                     
@@ -178,7 +170,6 @@ export default function FormBuilderPage() {
                       <TemplateListingTable
                         templates={currentTemplates}
                         onEdit={handleEditTemplate}
-                        onView={handleViewTemplate}
                         onCopy={handleCopyTemplate}
                         onDelete={handleDeleteTemplate}
                       />
@@ -205,9 +196,6 @@ export default function FormBuilderPage() {
                         <Button onClick={() => handleEditTemplate(selectedTemplate)}>
                           <FileText className="h-4 w-4 mr-2" />
                           Edit Template
-                        </Button>
-                        <Button variant="outline" onClick={() => handleViewTemplate(selectedTemplate)}>
-                          Preview Template
                         </Button>
                         <Button variant="outline" onClick={() => handleCopyTemplate(selectedTemplate)}>
                           Copy Template

@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   Select,
@@ -22,10 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
 import { 
   Eye, 
-  X,
   FileText,
   Clock,
   CheckCircle
@@ -35,7 +31,7 @@ import { Question, QuestionType } from '@/types';
 interface FormPreviewProps {
   questions: Question[];
   formTitle?: string;
-  formDescription?: string;
+  formDescription?: string | undefined;
 }
 
 export function FormPreview({ 
@@ -53,7 +49,7 @@ export function FormPreview({
     }));
   };
 
-  const renderQuestion = (question: Question, index: number) => {
+  const renderQuestion = (question: Question) => {
     const response = responses[question.id];
 
     switch (question.type) {
@@ -233,7 +229,7 @@ export function FormPreview({
             </div>
           ) : (
             <div className="space-y-6 p-1">
-              {questions.map((question, index) => renderQuestion(question, index))}
+              {questions.map((question) => renderQuestion(question))}
             </div>
           )}
         </div>

@@ -43,7 +43,6 @@ import { FormTemplate } from '@/types';
 interface TemplateListingTableProps {
   templates: FormTemplate[];
   onEdit?: (template: FormTemplate) => void;
-  onView?: (template: FormTemplate) => void;
   onCopy?: (template: FormTemplate) => void;
   onDelete?: (template: FormTemplate) => void;
 }
@@ -51,7 +50,6 @@ interface TemplateListingTableProps {
 export function TemplateListingTable({
   templates,
   onEdit,
-  onView,
   onCopy,
   onDelete
 }: TemplateListingTableProps) {
@@ -217,7 +215,7 @@ export function TemplateListingTable({
         },
       },
     ],
-    [onEdit, onView, onCopy, onDelete]
+    [onEdit, onCopy, onDelete]
   );
 
   const table = useReactTable({

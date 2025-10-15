@@ -29,33 +29,30 @@ import {
   FileText, 
   Plus, 
   ArrowLeft,
-  Settings,
   Copy,
   Edit,
   Eye,
   MoreHorizontal
 } from 'lucide-react';
 import { useFormHierarchy } from '@/hooks/use-form-hierarchy';
-import { FormCategory, FormType, FormTemplate } from '@/types';
+import { FormTemplate } from '@/types';
 
 interface FormHierarchyNavigationProps {
   onTemplateSelect?: (template: FormTemplate) => void;
-  onCreateTemplate?: (typeId: string) => void;
 }
 
 export function FormHierarchyNavigation({ 
-  onTemplateSelect, 
-  onCreateTemplate 
+  onTemplateSelect
 }: FormHierarchyNavigationProps) {
+  // Suppress unused variable warning
+  void onTemplateSelect;
   const {
     categories,
     selectedCategory,
     selectedType,
-    selectedTemplate,
     breadcrumbs,
     selectCategory,
     selectType,
-    selectTemplate,
     getTypesByCategory,
     getTemplatesByType,
     resetSelection
@@ -75,10 +72,7 @@ export function FormHierarchyNavigation({
     }
   };
 
-  const handleTemplateSelect = (template: FormTemplate) => {
-    selectTemplate(template);
-    onTemplateSelect?.(template);
-  };
+
 
   const handleTemplateEdit = (template: FormTemplate) => {
     // Navigate to form builder editor

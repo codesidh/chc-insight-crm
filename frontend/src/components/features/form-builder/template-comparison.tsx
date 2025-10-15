@@ -12,17 +12,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
 import { 
   GitBranch, 
   Plus, 
   Minus, 
   Edit, 
-  ArrowRight,
   FileText,
-  Calendar,
-  User,
-  Settings
+  Calendar
 } from 'lucide-react';
 import { FormTemplate, Question, QuestionType } from '@/types';
 

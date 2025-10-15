@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Type, 
@@ -17,7 +17,7 @@ export interface QuestionTypeDefinition {
   type: QuestionType;
   label: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<any>;
   category: 'input' | 'selection' | 'media' | 'layout';
   isAvailable: boolean; // For MVP, only some types are available
 }

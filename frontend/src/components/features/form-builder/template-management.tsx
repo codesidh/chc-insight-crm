@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { 
   Dialog,
   DialogContent,
@@ -15,7 +14,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
@@ -33,11 +31,7 @@ import {
   GitBranch,
   Power,
   PowerOff,
-  History,
-  Calendar,
-  User,
-  FileText,
-  Settings
+  History
 } from 'lucide-react';
 import { FormTemplate } from '@/types';
 
@@ -254,7 +248,7 @@ export function TemplateManagement({
           <DialogHeader>
             <DialogTitle>Copy Template</DialogTitle>
             <DialogDescription>
-              Create a copy of "{template.name}" with a new name
+              Create a copy of &quot;{template.name}&quot; with a new name
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -296,7 +290,7 @@ export function TemplateManagement({
           <DialogHeader>
             <DialogTitle>Create New Version</DialogTitle>
             <DialogDescription>
-              Create a new version of "{template.name}" (v{template.version + 1})
+              Create a new version of &quot;{template.name}&quot; (v{template.version + 1})
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">

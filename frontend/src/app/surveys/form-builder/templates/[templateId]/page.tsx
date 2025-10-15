@@ -5,14 +5,12 @@ import { useRouter, useParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { TemplateManagement } from '@/components/features/form-builder/template-management';
 import { TemplateComparison } from '@/components/features/form-builder/template-comparison';
 import { FormPreview } from '@/components/features/form-builder/form-preview';
 import { 
   ArrowLeft, 
   Edit, 
-  Eye, 
   Copy,
   GitBranch,
   Settings,
@@ -24,7 +22,7 @@ import formHierarchyData from '@/data/app/form_hierarchy_data.json';
 export default function TemplateManagementPage() {
   const router = useRouter();
   const params = useParams();
-  const templateId = params.templateId as string;
+  const templateId = params['templateId'] as string;
   
   const [template, setTemplate] = useState<FormTemplate | null>(null);
   const [allVersions, setAllVersions] = useState<FormTemplate[]>([]);
@@ -34,16 +32,27 @@ export default function TemplateManagementPage() {
     // Load template and all its versions
     const currentTemplate = formHierarchyData.templates.find(
       t => t.id === templateId
-    ) as FormTemplate;
+    );
     
     if (currentTemplate) {
-      setTemplate(currentTemplate);
+      // Convert string dates to Date objects
+      const convertedTemplate: FormTemplate = {
+        ...currentTemplate,
+        effectiveDate: new Date(currentTemplate.effectiveDate),
+        expirationDate: currentTemplate.expirationDate ? new Date(currentTemplate.expirationDate) : undefined
+      } as FormTemplate;
+    
+      setTemplate(convertedTemplate);
       
       // Find all versions of this template (same name pattern)
-      const baseName = currentTemplate.name.replace(/ v\d+\.\d+$/, '');
-      const versions = formHierarchyData.templates.filter(
-        t => t.name.startsWith(baseName) && t.typeId === currentTemplate.typeId
-      ) as FormTemplate[];
+      const baseName = convertedTemplate.name.replace(/ v\d+\.\d+$/, '');
+      const versions = formHierarchyData.templates
+        .filter(t => t.name.startsWith(baseName) && t.typeId === convertedTemplate.typeId)
+        .map(t => ({
+          ...t,
+          effectiveDate: new Date(t.effectiveDate),
+          expirationDate: t.expirationDate ? new Date(t.expirationDate) : undefined
+        } as FormTemplate));
       
       setAllVersions(versions);
     }
@@ -145,7 +154,7 @@ export default function TemplateManagementPage() {
                   <FormPreview 
                     questions={template.questions || []}
                     formTitle={template.name}
-                    formDescription={template.description}
+                    formDescription={template.description || undefined}
                   />
                   <Button variant="outline" onClick={() => handleEdit(template)}>
                     <Edit className="h-4 w-4 mr-2" />

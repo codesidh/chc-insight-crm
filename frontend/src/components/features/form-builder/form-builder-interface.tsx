@@ -10,20 +10,17 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
   Save, 
-  Eye, 
-  Settings, 
   ArrowLeft,
-  FileText,
-  Plus
+  FileText
 } from 'lucide-react';
 import { Question, QuestionType, FormTemplate } from '@/types';
-import { QuestionTypeLibrary, QuestionTypeDefinition, QUESTION_TYPES } from './question-type-library';
+import { QuestionTypeLibrary, QuestionTypeDefinition } from './question-type-library';
 import { FormCanvas } from './form-canvas';
 import { QuestionConfigurationPanel } from './question-configuration-panel';
 import { FormPreview } from './form-preview';
 
 interface FormBuilderInterfaceProps {
-  template?: FormTemplate;
+  template?: FormTemplate | undefined;
   onSave?: (template: Partial<FormTemplate>) => void;
   onBack?: () => void;
 }
@@ -47,12 +44,15 @@ export function FormBuilderInterface({
       type: questionType.type,
       text: getDefaultQuestionText(questionType.type),
       required: false,
-      validation: [],
-      options: questionType.type === QuestionType.SINGLE_SELECT ? [
+      validation: []
+    };
+
+    if (questionType.type === QuestionType.SINGLE_SELECT) {
+      newQuestion.options = [
         { id: 'option-1', label: 'Option 1', value: 'option_1' },
         { id: 'option-2', label: 'Option 2', value: 'option_2' }
-      ] : undefined
-    };
+      ];
+    }
 
     setQuestions(prev => [...prev, newQuestion]);
     setSelectedQuestion(newQuestion);
@@ -88,7 +88,7 @@ export function FormBuilderInterface({
     const templateData: Partial<FormTemplate> = {
       name: formName,
       description: formDescription,
-      questions: questions,
+      questions,
       version: template?.version || 1,
       isActive: template?.isActive ?? true
     };
@@ -205,7 +205,7 @@ export function FormBuilderInterface({
             {/* Form Canvas */}
             <FormCanvas
               questions={questions}
-              selectedQuestionId={selectedQuestion?.id}
+              selectedQuestionId={selectedQuestion?.id || undefined}
               onQuestionsChange={handleQuestionsChange}
               onQuestionSelect={handleQuestionSelect}
               onQuestionAdd={handleQuestionTypeSelect}

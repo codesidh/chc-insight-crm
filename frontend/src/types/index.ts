@@ -103,9 +103,21 @@ export interface Question {
 }
 
 // Legacy Survey Instance (for backward compatibility)
-export interface SurveyInstance extends FormInstance {
+export interface SurveyInstance {
+  id: string;
+  templateId: string;
+  tenantId: string;
+  memberId?: string;
+  providerId?: string;
+  assignedTo?: string;
+  status: SurveyStatus;
   responseData?: Record<string, any>;
   contextData?: Record<string, any>;
+  dueDate?: Date;
+  submittedAt?: Date;
+  approvedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Form Category and Type Enums

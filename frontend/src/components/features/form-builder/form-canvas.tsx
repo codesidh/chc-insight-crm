@@ -16,15 +16,13 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Plus, 
   Eye, 
   Settings,
-  FileText,
-  Trash2
+  FileText
 } from 'lucide-react';
 import { Question, QuestionType } from '@/types';
 import { QuestionTypeDefinition } from './question-type-library';
@@ -32,7 +30,7 @@ import { SortableQuestionItem } from './sortable-question-item';
 
 interface FormCanvasProps {
   questions: Question[];
-  selectedQuestionId?: string;
+  selectedQuestionId?: string | undefined;
   onQuestionsChange?: (questions: Question[]) => void;
   onQuestionSelect?: (question: Question) => void;
   onQuestionAdd?: (questionType: QuestionTypeDefinition) => void;
@@ -44,7 +42,7 @@ export function FormCanvas({
   selectedQuestionId,
   onQuestionsChange,
   onQuestionSelect,
-  onQuestionAdd,
+
   onPreview
 }: FormCanvasProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
