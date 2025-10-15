@@ -1,0 +1,215 @@
+{
+  "metrics": {
+    "formCompletion": {
+      "totalForms": 1247,
+      "completedForms": 1174,
+      "completionRate": 94.1,
+      "change": "+2.3%",
+      "changeType": "positive"
+    },
+    "categoryBreakdown": {
+      "cases": {
+        "total": 847,
+        "completed": 798,
+        "completionRate": 94.2,
+        "types": {
+          "bh_referrals": {
+            "name": "BH Referrals",
+            "total": 324,
+            "completed": 308,
+            "completionRate": 95.1,
+            "avgCompletionTime": "2.3 days"
+          },
+          "appeals": {
+            "name": "Appeals",
+            "total": 289,
+            "completed": 267,
+            "completionRate": 92.4,
+            "avgCompletionTime": "4.1 days"
+          },
+          "grievances": {
+            "name": "Grievances",
+            "total": 234,
+            "completed": 223,
+            "completionRate": 95.3,
+            "avgCompletionTime": "1.8 days"
+          }
+        }
+      },
+      "assessments": {
+        "total": 400,
+        "completed": 376,
+        "completionRate": 94.0,
+        "types": {
+          "health_risk_hdm": {
+            "name": "Health Risk (HDM)",
+            "total": 156,
+            "completed": 148,
+            "completionRate": 94.9,
+            "avgCompletionTime": "3.2 days"
+          },
+          "member_satisfaction": {
+            "name": "Member Satisfaction",
+            "total": 134,
+            "completed": 125,
+            "completionRate": 93.3,
+            "avgCompletionTime": "1.5 days"
+          },
+          "provider_performance": {
+            "name": "Provider Performance",
+            "total": 110,
+            "completed": 103,
+            "completionRate": 93.6,
+            "avgCompletionTime": "5.1 days"
+          }
+        }
+      }
+    },
+    "statusDistribution": [
+      {
+        "status": "Completed",
+        "count": 1174,
+        "percentage": 94.1,
+        "color": "hsl(var(--chart-1))"
+      },
+      {
+        "status": "Pending Review",
+        "count": 43,
+        "percentage": 3.4,
+        "color": "hsl(var(--chart-2))"
+      },
+      {
+        "status": "Draft",
+        "count": 23,
+        "percentage": 1.8,
+        "color": "hsl(var(--chart-3))"
+      },
+      {
+        "status": "Rejected",
+        "count": 7,
+        "percentage": 0.6,
+        "color": "hsl(var(--chart-4))"
+      }
+    ],
+    "complianceRates": [
+      {
+        "month": "Jul",
+        "cases": 92.1,
+        "assessments": 89.5,
+        "overall": 90.8
+      },
+      {
+        "month": "Aug",
+        "cases": 93.4,
+        "assessments": 91.2,
+        "overall": 92.3
+      },
+      {
+        "month": "Sep",
+        "cases": 94.8,
+        "assessments": 92.7,
+        "overall": 93.8
+      },
+      {
+        "month": "Oct",
+        "cases": 95.2,
+        "assessments": 93.1,
+        "overall": 94.2
+      },
+      {
+        "month": "Nov",
+        "cases": 94.9,
+        "assessments": 94.0,
+        "overall": 94.5
+      },
+      {
+        "month": "Dec",
+        "cases": 94.2,
+        "assessments": 94.0,
+        "overall": 94.1
+      }
+    ],
+    "productivityTrends": [
+      {
+        "week": "Week 1",
+        "formsCompleted": 287,
+        "avgCompletionTime": 2.8,
+        "staffUtilization": 89.2
+      },
+      {
+        "week": "Week 2",
+        "formsCompleted": 312,
+        "avgCompletionTime": 2.6,
+        "staffUtilization": 92.1
+      },
+      {
+        "week": "Week 3",
+        "formsCompleted": 298,
+        "avgCompletionTime": 2.9,
+        "staffUtilization": 87.5
+      },
+      {
+        "week": "Week 4",
+        "formsCompleted": 334,
+        "avgCompletionTime": 2.4,
+        "staffUtilization": 94.3
+      }
+    ]
+  },
+  "kpis": [
+    {
+      "id": "total-forms",
+      "title": "Total Forms",
+      "value": "1,247",
+      "change": "+89",
+      "changeLabel": "from last month",
+      "changeType": "positive",
+      "icon": "FileText"
+    },
+    {
+      "id": "completion-rate",
+      "title": "Completion Rate",
+      "value": "94.1%",
+      "change": "+2.3%",
+      "changeLabel": "from last month",
+      "changeType": "positive",
+      "icon": "TrendingUp"
+    },
+    {
+      "id": "avg-completion-time",
+      "title": "Avg Completion Time",
+      "value": "2.7 days",
+      "change": "-0.4 days",
+      "changeLabel": "from last month",
+      "changeType": "positive",
+      "icon": "Clock"
+    },
+    {
+      "id": "pending-reviews",
+      "title": "Pending Reviews",
+      "value": "43",
+      "change": "-12",
+      "changeLabel": "from yesterday",
+      "changeType": "positive",
+      "icon": "AlertCircle"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "overdue-forms",
+      "type": "warning",
+      "title": "Overdue Forms Alert",
+      "message": "7 forms are overdue for review",
+      "action": "Review Now",
+      "timestamp": "2 hours ago"
+    },
+    {
+      "id": "compliance-target",
+      "type": "info",
+      "title": "Compliance Target Met",
+      "message": "Monthly compliance rate of 94.1% exceeds target",
+      "action": "View Details",
+      "timestamp": "1 day ago"
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "reportTemplates": [
+    {
+      "id": "form-completion-summary",
+      "name": "Form Completion Summary",
+      "description": "Overview of form completion rates by category and type",
+      "category": "compliance",
+      "icon": "FileText",
+      "parameters": [
+        {
+          "name": "dateRange",
+          "label": "Date Range",
+          "type": "dateRange",
+          "required": true,
+          "defaultValue": "last30days"
+        },
+        {
+          "name": "formCategory",
+          "label": "Form Category",
+          "type": "select",
+          "options": [
+            { "value": "all", "label": "All Categories" },
+            { "value": "cases", "label": "Cases" },
+            { "value": "assessments", "label": "Assessments" }
+          ],
+          "defaultValue": "all"
+        },
+        {
+          "name": "formType",
+          "label": "Form Type",
+          "type": "multiSelect",
+          "options": [
+            { "value": "bh_referrals", "label": "BH Referrals" },
+            { "value": "appeals", "label": "Appeals" },
+            { "value": "grievances", "label": "Grievances" },
+            { "value": "health_risk_hdm", "label": "Health Risk (HDM)" },
+            { "value": "member_satisfaction", "label": "Member Satisfaction" },
+            { "value": "provider_performance", "label": "Provider Performance" }
+          ],
+          "defaultValue": []
+        }
+      ]
+    },
+    {
+      "id": "performance-metrics",
+      "name": "Performance Metrics Report",
+      "description": "Staff productivity and completion time analysis",
+      "category": "performance",
+      "icon": "TrendingUp",
+      "parameters": [
+        {
+          "name": "dateRange",
+          "label": "Date Range",
+          "type": "dateRange",
+          "required": true,
+          "defaultValue": "last30days"
+        },
+        {
+          "name": "userId",
+          "label": "Staff Member",
+          "type": "select",
+          "options": [
+            { "value": "all", "label": "All Staff" },
+            { "value": "user1", "label": "Sarah Johnson" },
+            { "value": "user2", "label": "Mike Chen" },
+            { "value": "user3", "label": "Lisa Rodriguez" }
+          ],
+          "defaultValue": "all"
+        },
+        {
+          "name": "includeMetrics",
+          "label": "Include Metrics",
+          "type": "multiSelect",
+          "options": [
+            { "value": "completion_times", "label": "Completion Times" },
+            { "value": "volume_metrics", "label": "Volume Metrics" },
+            { "value": "quality_scores", "label": "Quality Scores" }
+          ],
+          "defaultValue": ["completion_times", "volume_metrics"]
+        }
+      ]
+    },
+    {
+      "id": "compliance-audit",
+      "name": "Compliance Audit Report",
+      "description": "Detailed compliance tracking and audit trail",
+      "category": "compliance",
+      "icon": "Shield",
+      "parameters": [
+        {
+          "name": "dateRange",
+          "label": "Date Range",
+          "type": "dateRange",
+          "required": true,
+          "defaultValue": "last90days"
+        },
+        {
+          "name": "complianceLevel",
+          "label": "Compliance Level",
+          "type": "select",
+          "options": [
+            { "value": "all", "label": "All Levels" },
+            { "value": "compliant", "label": "Compliant Only" },
+            { "value": "non_compliant", "label": "Non-Compliant Only" }
+          ],
+          "defaultValue": "all"
+        }
+      ]
+    }
+  ],
+  "exportFormats": [
+    {
+      "value": "csv",
+      "label": "CSV",
+      "icon": "FileSpreadsheet",
+      "description": "Comma-separated values for spreadsheet applications"
+    },
+    {
+      "value": "excel",
+      "label": "Excel",
+      "icon": "FileSpreadsheet",
+      "description": "Microsoft Excel format with formatting"
+    },
+    {
+      "value": "pdf",
+      "label": "PDF",
+      "icon": "FileText",
+      "description": "Portable document format for sharing and printing"
+    }
+  ],
+  "schedulingOptions": [
+    {
+      "value": "once",
+      "label": "Run Once",
+      "description": "Generate report immediately"
+    },
+    {
+      "value": "daily",
+      "label": "Daily",
+      "description": "Generate report every day at specified time"
+    },
+    {
+      "value": "weekly",
+      "label": "Weekly",
+      "description": "Generate report weekly on specified day"
+    },
+    {
+      "value": "monthly",
+      "label": "Monthly",
+      "description": "Generate report monthly on specified date"
+    }
+  ],
+  "recentReports": [
+    {
+      "id": "report-001",
+      "name": "Form Completion Summary - December 2024",
+      "template": "form-completion-summary",
+      "generatedAt": "2024-12-15T10:30:00Z",
+      "generatedBy": "Sarah Johnson",
+      "status": "completed",
+      "format": "excel",
+      "size": "2.3 MB",
+      "downloadUrl": "/api/reports/report-001/download"
+    },
+    {
+      "id": "report-002",
+      "name": "Performance Metrics - Q4 2024",
+      "template": "performance-metrics",
+      "generatedAt": "2024-12-14T15:45:00Z",
+      "generatedBy": "Mike Chen",
+      "status": "completed",
+      "format": "pdf",
+      "size": "1.8 MB",
+      "downloadUrl": "/api/reports/report-002/download"
+    },
+    {
+      "id": "report-003",
+      "name": "Compliance Audit - November 2024",
+      "template": "compliance-audit",
+      "generatedAt": "2024-12-13T09:15:00Z",
+      "generatedBy": "Lisa Rodriguez",
+      "status": "processing",
+      "format": "csv",
+      "size": null,
+      "downloadUrl": null
+    }
+  ],
+  "scheduledReports": [
+    {
+      "id": "schedule-001",
+      "name": "Weekly Form Completion Summary",
+      "template": "form-completion-summary",
+      "schedule": "weekly",
+      "nextRun": "2024-12-22T08:00:00Z",
+      "recipients": ["sarah.johnson@example.com", "mike.chen@example.com"],
+      "format": "excel",
+      "isActive": true
+    },
+    {
+      "id": "schedule-002",
+      "name": "Monthly Performance Report",
+      "template": "performance-metrics",
+      "schedule": "monthly",
+      "nextRun": "2025-01-01T09:00:00Z",
+      "recipients": ["lisa.rodriguez@example.com"],
+      "format": "pdf",
+      "isActive": true
+    }
+  ]
+}

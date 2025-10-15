@@ -2,9 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AppLayout } from '@/components/layout/app-layout';
-import { Activity, CheckCircle } from 'lucide-react';
+import { Activity, CheckCircle, BarChart3 } from 'lucide-react';
 import { getIcon } from '@/lib/icon-utils';
 import { getDashboardData } from '@/lib/app-data';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const dashboardData = getDashboardData();
@@ -16,11 +17,35 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-8 py-6 md:py-8">
             <div className="px-4 lg:px-6 space-y-8">
               {/* Welcome Section */}
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight">{dashboardData.welcomeMessage.title}</h1>
-                <p className="text-muted-foreground text-lg">
-                  {dashboardData.welcomeMessage.description}
-                </p>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold tracking-tight">{dashboardData.welcomeMessage.title}</h1>
+                  <p className="text-muted-foreground text-lg">
+                    {dashboardData.welcomeMessage.description}
+                  </p>
+                </div>
+                
+                {/* Executive Dashboard Link */}
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardContent className="flex items-center justify-between p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                        <BarChart3 className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Executive Dashboard</h3>
+                        <p className="text-sm text-muted-foreground">
+                          View comprehensive analytics and form completion metrics
+                        </p>
+                      </div>
+                    </div>
+                    <Link href="/dashboard/executive">
+                      <Button>
+                        View Analytics
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
               </div>
               
               {/* Quick Stats */}

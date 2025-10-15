@@ -1,0 +1,252 @@
+{
+  "users": [
+    {
+      "id": "user-001",
+      "email": "sarah.johnson@example.com",
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "roles": ["service_coordinator"],
+      "tenantId": "tenant-001",
+      "isActive": true,
+      "lastLogin": "2024-12-15T09:30:00Z",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "region": "North",
+      "memberPanel": ["panel-001", "panel-002"],
+      "providerNetwork": ["network-001"]
+    },
+    {
+      "id": "user-002",
+      "email": "mike.chen@example.com",
+      "firstName": "Mike",
+      "lastName": "Chen",
+      "roles": ["um_nurse", "manager"],
+      "tenantId": "tenant-001",
+      "isActive": true,
+      "lastLogin": "2024-12-15T08:45:00Z",
+      "createdAt": "2024-02-01T14:30:00Z",
+      "region": "South",
+      "memberPanel": ["panel-003"],
+      "providerNetwork": ["network-002", "network-003"]
+    },
+    {
+      "id": "user-003",
+      "email": "lisa.rodriguez@example.com",
+      "firstName": "Lisa",
+      "lastName": "Rodriguez",
+      "roles": ["qm_staff"],
+      "tenantId": "tenant-001",
+      "isActive": true,
+      "lastLogin": "2024-12-14T16:20:00Z",
+      "createdAt": "2024-03-10T11:15:00Z",
+      "region": "East",
+      "memberPanel": ["panel-004", "panel-005"],
+      "providerNetwork": ["network-001", "network-004"]
+    },
+    {
+      "id": "user-004",
+      "email": "david.kim@example.com",
+      "firstName": "David",
+      "lastName": "Kim",
+      "roles": ["administrator"],
+      "tenantId": "tenant-001",
+      "isActive": true,
+      "lastLogin": "2024-12-15T07:15:00Z",
+      "createdAt": "2024-01-01T09:00:00Z",
+      "region": "All",
+      "memberPanel": [],
+      "providerNetwork": []
+    },
+    {
+      "id": "user-005",
+      "email": "jennifer.white@example.com",
+      "firstName": "Jennifer",
+      "lastName": "White",
+      "roles": ["communications_team"],
+      "tenantId": "tenant-001",
+      "isActive": false,
+      "lastLogin": "2024-11-28T15:45:00Z",
+      "createdAt": "2024-04-20T13:20:00Z",
+      "region": "West",
+      "memberPanel": ["panel-006"],
+      "providerNetwork": ["network-005"]
+    }
+  ],
+  "roles": [
+    {
+      "id": "administrator",
+      "name": "Administrator",
+      "description": "Full system access and configuration",
+      "permissions": [
+        "users.create",
+        "users.read",
+        "users.update",
+        "users.delete",
+        "forms.create",
+        "forms.read",
+        "forms.update",
+        "forms.delete",
+        "reports.create",
+        "reports.read",
+        "reports.schedule",
+        "system.configure"
+      ],
+      "color": "red"
+    },
+    {
+      "id": "service_coordinator",
+      "name": "Service Coordinator",
+      "description": "Manage member cases and assessments",
+      "permissions": [
+        "forms.create",
+        "forms.read",
+        "forms.update",
+        "members.read",
+        "providers.read",
+        "reports.read"
+      ],
+      "color": "blue"
+    },
+    {
+      "id": "um_nurse",
+      "name": "UM Nurse",
+      "description": "Utilization management and clinical review",
+      "permissions": [
+        "forms.read",
+        "forms.update",
+        "forms.approve",
+        "members.read",
+        "providers.read",
+        "reports.read"
+      ],
+      "color": "green"
+    },
+    {
+      "id": "qm_staff",
+      "name": "QM Staff",
+      "description": "Quality management and compliance",
+      "permissions": [
+        "forms.read",
+        "forms.audit",
+        "reports.create",
+        "reports.read",
+        "reports.schedule",
+        "compliance.monitor"
+      ],
+      "color": "purple"
+    },
+    {
+      "id": "communications_team",
+      "name": "Communications Team",
+      "description": "Member and provider communications",
+      "permissions": [
+        "forms.read",
+        "members.read",
+        "providers.read",
+        "communications.send"
+      ],
+      "color": "orange"
+    },
+    {
+      "id": "manager",
+      "name": "Manager",
+      "description": "Team management and oversight",
+      "permissions": [
+        "forms.read",
+        "forms.assign",
+        "forms.approve",
+        "reports.create",
+        "reports.read",
+        "team.manage"
+      ],
+      "color": "indigo"
+    }
+  ],
+  "regions": [
+    { "value": "north", "label": "North Region" },
+    { "value": "south", "label": "South Region" },
+    { "value": "east", "label": "East Region" },
+    { "value": "west", "label": "West Region" },
+    { "value": "all", "label": "All Regions" }
+  ],
+  "memberPanels": [
+    { "id": "panel-001", "name": "Panel A - North", "memberCount": 1250 },
+    { "id": "panel-002", "name": "Panel B - North", "memberCount": 980 },
+    { "id": "panel-003", "name": "Panel C - South", "memberCount": 1100 },
+    { "id": "panel-004", "name": "Panel D - East", "memberCount": 890 },
+    { "id": "panel-005", "name": "Panel E - East", "memberCount": 1340 },
+    { "id": "panel-006", "name": "Panel F - West", "memberCount": 750 }
+  ],
+  "providerNetworks": [
+    { "id": "network-001", "name": "Primary Care Network", "providerCount": 245 },
+    { "id": "network-002", "name": "Specialty Care Network", "providerCount": 189 },
+    { "id": "network-003", "name": "Behavioral Health Network", "providerCount": 156 },
+    { "id": "network-004", "name": "LTSS Provider Network", "providerCount": 298 },
+    { "id": "network-005", "name": "Pharmacy Network", "providerCount": 67 }
+  ],
+  "tenantConfiguration": {
+    "id": "tenant-001",
+    "name": "CHC Health Plan",
+    "subdomain": "chc-health",
+    "configuration": {
+      "branding": {
+        "primaryColor": "#0066cc",
+        "logo": "/logos/chc-health-logo.png",
+        "favicon": "/favicons/chc-health.ico"
+      },
+      "features": {
+        "multiTenant": true,
+        "advancedReporting": true,
+        "apiAccess": true,
+        "customWorkflows": true
+      },
+      "security": {
+        "passwordPolicy": {
+          "minLength": 8,
+          "requireUppercase": true,
+          "requireLowercase": true,
+          "requireNumbers": true,
+          "requireSpecialChars": true
+        },
+        "sessionTimeout": 480,
+        "maxLoginAttempts": 5
+      },
+      "notifications": {
+        "emailEnabled": true,
+        "smsEnabled": false,
+        "webhookEnabled": true
+      }
+    },
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z"
+  },
+  "userActivity": [
+    {
+      "userId": "user-001",
+      "action": "form.submit",
+      "resource": "BH Initial Referral",
+      "timestamp": "2024-12-15T09:30:00Z",
+      "details": "Submitted form for member M-12345"
+    },
+    {
+      "userId": "user-002",
+      "action": "form.approve",
+      "resource": "Health Risk Assessment",
+      "timestamp": "2024-12-15T08:45:00Z",
+      "details": "Approved assessment for member M-67890"
+    },
+    {
+      "userId": "user-003",
+      "action": "report.generate",
+      "resource": "Compliance Report",
+      "timestamp": "2024-12-14T16:20:00Z",
+      "details": "Generated monthly compliance report"
+    },
+    {
+      "userId": "user-004",
+      "action": "user.create",
+      "resource": "User Management",
+      "timestamp": "2024-12-14T10:15:00Z",
+      "details": "Created new user account for John Doe"
+    }
+  ]
+}
