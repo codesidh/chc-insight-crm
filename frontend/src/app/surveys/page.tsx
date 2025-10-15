@@ -33,10 +33,17 @@ export default function SurveysPage() {
                 {surveysData.pageInfo.description}
               </p>
             </div>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Survey
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" asChild>
+                <a href="/surveys/form-builder">
+                  Form Builder
+                </a>
+              </Button>
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Create Survey
+              </Button>
+            </div>
           </div>
 
           {/* Survey Stats */}

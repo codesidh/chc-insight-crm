@@ -28,21 +28,65 @@ export interface Tenant {
   isActive: boolean;
 }
 
-// Survey types
-export interface SurveyTemplate {
+// Hierarchical Form Structure Types
+export interface FormCategory {
   id: string;
-  name: string;
+  name: string; // 'Cases' | 'Assessments'
   description?: string;
-  type: SurveyType;
+  tenantId: string;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+export interface FormType {
+  id: string;
+  categoryId: string;
+  name: string; // 'BH Referrals', 'Health Risk (HDM)', etc.
+  description?: string;
+  tenantId: string;
+  businessRules: BusinessRule[];
+  isActive: boolean;
+  createdAt: Date;
+}
+
+export interface FormTemplate {
+  id: string;
+  typeId: string;
+  name: string; // 'BH Initial Referral v1.0'
+  description?: string;
   version: number;
   tenantId: string;
   questions: Question[];
-  businessRules: BusinessRule[];
   workflow: WorkflowConfig;
   isActive: boolean;
   effectiveDate: Date;
   expirationDate?: Date;
   createdBy: string;
+  dueDateCalculation?: DueDateRule;
+  reminderFrequency?: ReminderConfig;
+  autoAssignmentRules?: AssignmentRule[];
+}
+
+export interface FormInstance {
+  id: string;
+  templateId: string;
+  tenantId: string;
+  memberId?: string;
+  providerId?: string;
+  assignedTo?: string;
+  status: FormStatus;
+  responseData: ResponseData[];
+  contextData: any;
+  dueDate?: Date;
+  submittedAt?: Date;
+  approvedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Legacy Survey types (for backward compatibility)
+export interface SurveyTemplate extends FormTemplate {
+  type: SurveyType;
 }
 
 export interface Question {
@@ -58,24 +102,40 @@ export interface Question {
   prePopulationMapping?: string;
 }
 
-export interface SurveyInstance {
-  id: string;
-  templateId: string;
-  tenantId: string;
-  memberId?: string;
-  providerId?: string;
-  assignedTo?: string;
-  status: SurveyStatus;
+// Legacy Survey Instance (for backward compatibility)
+export interface SurveyInstance extends FormInstance {
   responseData?: Record<string, any>;
   contextData?: Record<string, any>;
-  dueDate?: Date;
-  submittedAt?: Date;
-  approvedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
-// Enums
+// Form Category and Type Enums
+export enum FormCategoryType {
+  CASES = 'cases',
+  ASSESSMENTS = 'assessments'
+}
+
+export enum CaseFormType {
+  BH_REFERRALS = 'bh_referrals',
+  APPEALS = 'appeals',
+  GRIEVANCES = 'grievances'
+}
+
+export enum AssessmentFormType {
+  HEALTH_RISK_HDM = 'health_risk_hdm',
+  MEMBER_SATISFACTION = 'member_satisfaction',
+  PROVIDER_PERFORMANCE = 'provider_performance'
+}
+
+export enum FormStatus {
+  DRAFT = 'draft',
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled'
+}
+
+// Legacy Enums (for backward compatibility)
 export enum SurveyType {
   INITIAL_ASSESSMENT = 'initial_assessment',
   REASSESSMENT = 'reassessment',
@@ -156,4 +216,48 @@ export interface WorkflowTransition {
   to: string;
   trigger: string;
   conditions?: Record<string, any>;
+}
+
+// Additional Form-related interfaces
+export interface ResponseData {
+  questionId: string;
+  value: any;
+  metadata?: Record<string, any>;
+}
+
+export interface DueDateRule {
+  type: 'days' | 'weeks' | 'months';
+  value: number;
+  businessDaysOnly?: boolean;
+}
+
+export interface ReminderConfig {
+  enabled: boolean;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  daysBeforeDue?: number;
+}
+
+export interface AssignmentRule {
+  id: string;
+  criteria: Record<string, any>;
+  assignedRole?: string;
+  assignedUserId?: string;
+  priority: number;
+}
+
+// Form Builder specific types
+export interface FormHierarchyNode {
+  id: string;
+  name: string;
+  type: 'category' | 'type' | 'template';
+  parentId?: string;
+  children?: FormHierarchyNode[];
+  metadata?: Record<string, any>;
+}
+
+export interface BreadcrumbItem {
+  id: string;
+  name: string;
+  type: 'category' | 'type' | 'template';
+  href?: string;
 }

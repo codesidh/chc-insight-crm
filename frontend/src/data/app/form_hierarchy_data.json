@@ -1,0 +1,212 @@
+{
+  "categories": [
+    {
+      "id": "cases",
+      "name": "Cases",
+      "description": "Operational workflows and case management forms",
+      "tenantId": "tenant-1",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "assessments", 
+      "name": "Assessments",
+      "description": "Evaluation and monitoring assessment forms",
+      "tenantId": "tenant-1",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "types": [
+    {
+      "id": "bh-referrals",
+      "categoryId": "cases",
+      "name": "BH Referrals",
+      "description": "Behavioral Health referral processing forms",
+      "tenantId": "tenant-1",
+      "businessRules": [],
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "appeals",
+      "categoryId": "cases", 
+      "name": "Appeals",
+      "description": "Member appeal and grievance forms",
+      "tenantId": "tenant-1",
+      "businessRules": [],
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "grievances",
+      "categoryId": "cases",
+      "name": "Grievances", 
+      "description": "Member complaint and grievance forms",
+      "tenantId": "tenant-1",
+      "businessRules": [],
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "health-risk-hdm",
+      "categoryId": "assessments",
+      "name": "Health Risk (HDM)",
+      "description": "Health risk assessment and HDM evaluation forms",
+      "tenantId": "tenant-1", 
+      "businessRules": [],
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "member-satisfaction",
+      "categoryId": "assessments",
+      "name": "Member Satisfaction",
+      "description": "Member satisfaction and experience surveys",
+      "tenantId": "tenant-1",
+      "businessRules": [],
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "provider-performance",
+      "categoryId": "assessments",
+      "name": "Provider Performance", 
+      "description": "Provider quality and performance evaluation forms",
+      "tenantId": "tenant-1",
+      "businessRules": [],
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "templates": [
+    {
+      "id": "bh-initial-referral-v1",
+      "typeId": "bh-referrals",
+      "name": "BH Initial Referral v1.0",
+      "description": "Initial behavioral health referral assessment form",
+      "version": 1,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "createdBy": "admin-user"
+    },
+    {
+      "id": "bh-initial-referral-v2",
+      "typeId": "bh-referrals", 
+      "name": "BH Initial Referral v2.0",
+      "description": "Updated initial behavioral health referral assessment form",
+      "version": 2,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-06-01T00:00:00Z",
+      "createdBy": "admin-user"
+    },
+    {
+      "id": "bh-followup-referral-v1",
+      "typeId": "bh-referrals",
+      "name": "BH Follow-up Referral v1.0", 
+      "description": "Follow-up behavioral health referral form",
+      "version": 1,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "createdBy": "admin-user"
+    },
+    {
+      "id": "medical-service-appeal-v1",
+      "typeId": "appeals",
+      "name": "Medical Service Appeal v1.0",
+      "description": "Medical service denial appeal form",
+      "version": 1,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "createdBy": "admin-user"
+    },
+    {
+      "id": "pharmacy-appeal-v1",
+      "typeId": "appeals",
+      "name": "Pharmacy Appeal v1.0",
+      "description": "Pharmacy service denial appeal form", 
+      "version": 1,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "createdBy": "admin-user"
+    },
+    {
+      "id": "annual-hdm-assessment-v1",
+      "typeId": "health-risk-hdm",
+      "name": "Annual HDM Assessment v1.0",
+      "description": "Annual health risk and HDM comprehensive assessment",
+      "version": 1,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "createdBy": "admin-user"
+    },
+    {
+      "id": "quarterly-hdm-screening-v1",
+      "typeId": "health-risk-hdm",
+      "name": "Quarterly HDM Screening v1.0",
+      "description": "Quarterly health risk screening and monitoring",
+      "version": 1,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "createdBy": "admin-user"
+    },
+    {
+      "id": "post-service-survey-v1",
+      "typeId": "member-satisfaction",
+      "name": "Post-Service Survey v1.0",
+      "description": "Member satisfaction survey after service delivery",
+      "version": 1,
+      "tenantId": "tenant-1",
+      "questions": [],
+      "workflow": {
+        "states": [],
+        "transitions": []
+      },
+      "isActive": true,
+      "effectiveDate": "2024-01-01T00:00:00Z",
+      "createdBy": "admin-user"
+    }
+  ]
+}
