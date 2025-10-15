@@ -133,7 +133,7 @@
     /* Prevent layout shifts */
     min-height: 100vh;
     /* Smooth transition for theme changes */
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 300ms ease, color 300ms ease;
   }
   
   /* Optimize font rendering */

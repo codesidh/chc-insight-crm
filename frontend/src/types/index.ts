@@ -198,6 +198,7 @@ export interface ConditionalRule {
   condition: string;
   action: string;
   targetQuestionId: string;
+  value?: any;
 }
 
 export interface QuestionOption {

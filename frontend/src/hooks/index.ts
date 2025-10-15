@@ -14,6 +14,7 @@ export * from './use-surveys'
 export * from './use-work-queue'
 export * from './use-mobile'
 export * from './use-form-hierarchy'
+export * from './use-form-execution'
 
 // Re-export commonly used types
 export type { DragItem, DropZone, UseDragAndDropOptions } from './use-drag-and-drop'
