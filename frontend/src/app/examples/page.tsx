@@ -7,18 +7,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 
-// Import all example components
+// Import dynamic components to reduce initial bundle size
 import {
   ComplianceAreaChart,
   SurveyTypePieChart,
   ProductivityBarChart,
   ComplianceLineChart,
   DashboardChartsExample,
-} from "@/components/examples/chart-examples"
+} from "@/components/examples/chart-examples-dynamic"
 
 import {
   ChartAreaInteractive,
-} from "@/components/examples/interactive-chart-example"
+} from "@/components/examples/interactive-chart-dynamic"
 
 import {
   GlobalCommandPalette,
@@ -31,7 +31,7 @@ import {
 import {
   SurveyTemplateForm,
   MemberAssessmentForm,
-} from "@/components/examples/form-examples"
+} from "@/components/examples/form-examples-dynamic"
 
 import {
   SurveyBreadcrumbExample,

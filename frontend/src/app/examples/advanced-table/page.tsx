@@ -1,5 +1,5 @@
-import { AdvancedDataTableExample } from "@/components/examples/advanced-data-table-example"
+import { AdvancedDataTableExampleDynamic } from "@/components/examples/advanced-data-table-dynamic"
 
 export default function AdvancedTablePage() {
-  return <AdvancedDataTableExample />
+  return <AdvancedDataTableExampleDynamic />
 }

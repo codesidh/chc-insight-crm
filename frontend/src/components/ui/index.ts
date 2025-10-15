@@ -48,7 +48,8 @@ export { Badge, badgeVariants } from './badge'
 export { Label } from './label'
 export { Switch } from './switch'
 export { Textarea } from './textarea'
-export { AdvancedDataTable, dataTableSchema, type DataTableItem } from './advanced-data-table'
+// Note: AdvancedDataTable is excluded from barrel exports to prevent accidental bundle bloat
+// Import directly: import { AdvancedDataTable } from '@/components/ui/advanced-data-table'
 export { Checkbox } from './checkbox'
 export { 
   Tabs, 
@@ -66,14 +67,8 @@ export {
   DrawerTitle,
   DrawerTrigger
 } from './drawer'
-export type { ChartConfig } from './chart'
-export {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent
-} from './chart'
+// Note: Chart components are excluded from barrel exports to prevent accidental bundle bloat
+// Import directly: import { ChartContainer } from '@/components/ui/chart'
 export { 
   MetricCard, 
   MemberMetricCard, 

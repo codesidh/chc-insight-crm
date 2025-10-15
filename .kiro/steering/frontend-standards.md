@@ -304,6 +304,166 @@ import { componentSizes, animations } from '@/config'
 - Follow healthcare color semantics
 - Support light/dark themes
 
+## Bundle Optimization Standards
+
+### CRITICAL: Performance Targets
+**MANDATORY**: All routes must meet these bundle size requirements:
+
+- **Optimal**: < 150 kB First Load JS
+- **Good**: < 200 kB First Load JS  
+- **Acceptable**: 200-300 kB First Load JS
+- **PROHIBITED**: > 300 kB First Load JS
+
+### Heavy Component Management
+
+#### Dynamic Import Requirements
+**MANDATORY**: Components with these dependencies MUST use dynamic imports:
+
+```typescript
+// Heavy libraries requiring dynamic imports:
+// - @dnd-kit/* (drag-and-drop) ~55 kB
+// - @tanstack/react-table ~45 kB  
+// - recharts ~85 kB
+// - Any component bundle > 20 kB
+
+// ✅ CORRECT: Dynamic import pattern
+const AdvancedDataTable = dynamic(
+  () => import('./advanced-data-table').then(mod => ({ default: mod.AdvancedDataTable })),
+  {
+    loading: () => <TableSkeleton />,
+    ssr: false, // Disable SSR for heavy components
+  }
+)
+
+// ❌ WRONG: Direct import of heavy components
+import { AdvancedDataTable } from '@/components/ui/advanced-data-table'
+```
+
+#### Loading Skeleton Requirements
+**MANDATORY**: All dynamic imports MUST include loading skeletons:
+
+```typescript
+// Required skeleton components:
+import { TableSkeleton } from '@/components/ui/loading-skeleton'    // For data tables
+import { ChartSkeleton } from '@/components/ui/loading-skeleton'    // For charts  
+import { FormSkeleton } from '@/components/ui/loading-skeleton'     // For forms
+import { ExamplesSkeleton } from '@/components/ui/loading-skeleton' // For examples
+```
+
+### Barrel Export Restrictions
+
+#### PROHIBITED Heavy Component Exports
+**CRITICAL**: These components MUST NOT be included in barrel exports (`@/components/ui/index.ts`):
+
+```typescript
+// ❌ PROHIBITED in barrel exports:
+// export { AdvancedDataTable } from './advanced-data-table'  // ~100 kB with deps
+// export { ChartContainer } from './chart'                   // ~85 kB with recharts
+// export { DragDropProvider } from './drag-drop'             // ~55 kB with @dnd-kit
+
+// ✅ CORRECT: Direct imports only
+// Import directly: import { AdvancedDataTable } from '@/components/ui/advanced-data-table'
+```
+
+#### Safe Barrel Exports
+**ALLOWED**: Only lightweight components (< 5 kB) in barrel exports:
+
+```typescript
+// ✅ SAFE for barrel exports:
+export { Button } from './button'           // ~2 kB
+export { Input } from './input'             // ~1 kB  
+export { Card } from './card'               // ~3 kB
+export { Badge } from './badge'             // ~1 kB
+```
+
+### Bundle Analysis Requirements
+
+#### Pre-Commit Validation
+**MANDATORY**: Run before every commit:
+
+```bash
+npm run build                    # Check bundle sizes
+npm run analyze                  # Generate bundle report (if sizes increase)
+```
+
+#### Bundle Size Monitoring
+**MANDATORY**: Monitor these metrics:
+
+```bash
+# Bundle analysis commands
+npm run analyze                  # Full bundle analysis with visual reports
+npm run bundle-report           # Generate detailed bundle breakdown
+npm run build                   # Check current First Load JS sizes
+
+# Performance targets per route:
+# - Core routes (dashboard, analytics): < 170 kB ✅
+# - Feature routes (surveys, members): < 200 kB ✅  
+# - Example routes: < 210 kB ✅
+# - Settings/admin routes: < 250 kB ✅
+```
+
+### Webpack Configuration Standards
+
+#### Required Bundle Splitting
+**MANDATORY**: Heavy libraries MUST be split into separate chunks:
+
+```typescript
+// next.config.ts - Required configuration
+webpack: (config, { isServer }) => {
+  if (!isServer) {
+    config.optimization.splitChunks = {
+      cacheGroups: {
+        // MANDATORY: Separate chunk for drag-and-drop
+        dndkit: {
+          test: /[\\/]node_modules[\\/]@dnd-kit[\\/]/,
+          name: 'dnd-kit',
+          chunks: 'all',
+          priority: 30,
+        },
+        // MANDATORY: Separate chunk for table library  
+        reactTable: {
+          test: /[\\/]node_modules[\\/]@tanstack[\\/]react-table[\\/]/,
+          name: 'react-table', 
+          chunks: 'all',
+          priority: 30,
+        },
+        // MANDATORY: Separate chunk for charts
+        recharts: {
+          test: /[\\/]node_modules[\\/]recharts[\\/]/,
+          name: 'recharts',
+          chunks: 'all', 
+          priority: 30,
+        },
+      },
+    };
+  }
+  return config;
+}
+```
+
+### Component Creation Guidelines
+
+#### Bundle Impact Assessment
+**MANDATORY**: Before creating components, assess bundle impact:
+
+1. **Lightweight Components** (< 5 kB): Create normally
+2. **Medium Components** (5-20 kB): Consider lazy loading
+3. **Heavy Components** (> 20 kB): MUST use dynamic imports
+4. **Critical Path Components**: Keep under 10 kB
+
+#### Heavy Dependency Alternatives
+**RECOMMENDED**: Use lighter alternatives when possible:
+
+```typescript
+// Heavy dependencies to avoid in critical paths:
+// - @dnd-kit/* → Consider native HTML5 drag-and-drop for simple cases
+// - recharts → Consider native SVG for simple charts
+// - @tanstack/react-table → Consider native HTML tables for simple data
+
+// ✅ PREFERRED: Lightweight alternatives for non-critical features
+// ❌ AVOID: Heavy libraries in core user flows
+```
+
 ## Enforcement Rules
 
 ### Mandatory Checks
@@ -311,6 +471,9 @@ import { componentSizes, animations } from '@/config'
 - Run TypeScript validation after changes
 - Follow the 5-step UI workflow
 - Use design system tokens
+- **NEW**: Verify bundle size impact before adding heavy components
+- **NEW**: Run `npm run build` to check First Load JS sizes
+- **NEW**: Use dynamic imports for components > 20 kB
 
 ### Prohibited Actions
 - Creating custom UI components without checking registry
@@ -318,16 +481,118 @@ import { componentSizes, animations } from '@/config'
 - Using inline styles instead of Tailwind
 - Importing example components in production
 - Removing unused imports manually (use ESLint autofix)
+- **NEW**: Adding heavy components to barrel exports
+- **NEW**: Direct imports of @dnd-kit, @tanstack/react-table, or recharts in critical paths
+- **NEW**: Creating routes with > 300 kB First Load JS
+- **NEW**: Skipping loading skeletons for dynamic imports
 
 ### Violation Consequences
 - If Kiro suggests custom components without checking registry first, user should remind: **"Check shadcn registry first"**
 - If Kiro doesn't follow the 5-step workflow above, user should say: **"Follow the mandatory UI workflow"**
+- **NEW**: If Kiro suggests heavy component imports without dynamic loading, user should say: **"Use dynamic imports for heavy components"**
+- **NEW**: If bundle sizes exceed targets, user should say: **"Check bundle optimization guidelines"**
 
 ### Code Review Requirements
 - Verify shadcn/ui registry was checked
 - Confirm proper import paths
 - Validate design system usage
 - Check responsive design implementation
+- **NEW**: Verify heavy components use dynamic imports
+- **NEW**: Confirm loading skeletons are implemented
+- **NEW**: Check that bundle size targets are met
+- **NEW**: Validate no heavy components in barrel exports
+
+## Dependency Management Standards
+
+### Bundle Impact Assessment
+**MANDATORY**: Before adding any new dependency, assess its impact:
+
+```bash
+# Check dependency size before installing
+npm info <package-name> | grep unpacked
+npx bundlephobia <package-name>
+
+# After installation, verify bundle impact
+npm run build
+npm run analyze  # If First Load JS increases significantly
+```
+
+### Dependency Categories
+
+#### ✅ APPROVED: Lightweight Dependencies (< 10 kB)
+- `clsx`, `tailwind-merge` - Utility libraries
+- `zod` - Validation (tree-shakeable)
+- `lucide-react` - Icons (tree-shakeable)
+- `date-fns` - Date utilities (tree-shakeable)
+
+#### ⚠️ CONDITIONAL: Medium Dependencies (10-50 kB)
+- `@radix-ui/*` - UI primitives (use selectively)
+- `react-hook-form` - Forms (acceptable for form-heavy routes)
+- `@tanstack/react-query` - State management (core dependency)
+
+#### 🚨 RESTRICTED: Heavy Dependencies (> 50 kB)
+- `@dnd-kit/*` - Drag and drop (MUST use dynamic imports)
+- `@tanstack/react-table` - Data tables (MUST use dynamic imports)
+- `recharts` - Charts (MUST use dynamic imports)
+- `framer-motion` - Animations (avoid unless critical)
+
+#### ❌ PROHIBITED: Extremely Heavy Dependencies (> 100 kB)
+- `lodash` - Use native JS or lightweight alternatives
+- `moment.js` - Use `date-fns` instead
+- `antd`, `material-ui` - Use shadcn/ui instead
+- `three.js` - Avoid unless absolutely necessary
+
+### Tree Shaking Requirements
+**MANDATORY**: Ensure all dependencies support tree shaking:
+
+```typescript
+// ✅ CORRECT: Tree-shakeable imports
+import { format } from 'date-fns'
+import { Calendar } from 'lucide-react'
+import { z } from 'zod'
+
+// ❌ WRONG: Full library imports
+import * as dateFns from 'date-fns'
+import * as LucideIcons from 'lucide-react'
+import lodash from 'lodash'
+```
+
+## Performance Monitoring Standards
+
+### Build-Time Monitoring
+**MANDATORY**: Monitor these metrics in CI/CD:
+
+```bash
+# Bundle size regression detection
+npm run build
+# Fail build if any route exceeds:
+# - 200 kB for core routes
+# - 250 kB for feature routes  
+# - 300 kB for any route (hard limit)
+```
+
+### Development Monitoring
+**MANDATORY**: Use these tools during development:
+
+```typescript
+// Performance monitoring in development
+import { logPerformanceMetrics } from '@/lib/performance'
+
+// In layout.tsx or _app.tsx
+useEffect(() => {
+  if (process.env.NODE_ENV === 'development') {
+    logPerformanceMetrics()
+  }
+}, [])
+```
+
+### Production Monitoring
+**RECOMMENDED**: Track these metrics in production:
+
+- First Load JS per route
+- Core Web Vitals (LCP, FID, CLS)
+- Bundle cache hit rates
+- Route-level performance metrics
 
 ## Development Commands
 
@@ -340,10 +605,43 @@ npm run lint             # Lint all code
 npm run lint:fix         # Fix linting issues
 ```
 
+### Bundle Analysis Commands
+```bash
+npm run build            # Check current bundle sizes
+npm run analyze          # Generate visual bundle analysis
+npm run bundle-report    # Detailed bundle breakdown
+npm run analyze:server   # Server bundle analysis
+npm run analyze:browser  # Browser bundle analysis
+```
+
 ## Document Standards
 
 - Move all `.md` files to `frontend/docs/` folder (except `.kiro/` folder contents)
 - Use consistent documentation patterns
 - Include code examples and usage patterns
+- Document bundle optimization decisions and performance impacts
 
-This comprehensive standard ensures maintainable, scalable, and consistent UI development across the entire CHC Insight CRM application.
+## Bundle Optimization Success Metrics
+
+### Achieved Performance Targets ✅
+- `/examples`: 361 kB → 205 kB (43% reduction)
+- `/examples/advanced-table`: 325 kB → 113 kB (65% reduction)  
+- `/settings`: 357 kB → 168 kB (53% reduction)
+- **Total savings**: 557 kB across problematic routes
+
+### Maintenance Guidelines
+1. **Monthly Bundle Audits**: Review bundle sizes and identify growth
+2. **Dependency Impact Assessment**: Evaluate new dependencies before adding
+3. **Performance Regression Testing**: Monitor bundle sizes in CI/CD
+4. **Dynamic Import Compliance**: Ensure heavy components use lazy loading
+
+### Emergency Bundle Bloat Response
+If any route exceeds performance targets:
+
+1. **Immediate**: Run `npm run analyze` to identify heavy chunks
+2. **Assess**: Check for new heavy dependencies or barrel export violations
+3. **Optimize**: Implement dynamic imports for heavy components
+4. **Validate**: Confirm bundle sizes return to acceptable ranges
+5. **Document**: Update this guide with lessons learned
+
+This comprehensive standard ensures maintainable, scalable, consistent UI development, and optimal performance across the entire CHC Insight CRM application.
