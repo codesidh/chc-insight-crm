@@ -7,8 +7,8 @@ import {
   Home, 
   Users, 
   Workflow,
-  Building2,
-  Plus
+  Plus,
+  BriefcaseMedical
 } from "lucide-react"
 
 import {
@@ -24,7 +24,7 @@ const iconMap = {
   "/dashboard": Home,
   "/surveys": FileText,
   "/members": Users,
-  "/providers": Building2,
+  "/providers": BriefcaseMedical,
   "/workflows": Workflow,
 }
 

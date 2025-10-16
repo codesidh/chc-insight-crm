@@ -30,7 +30,7 @@ const data = {
       url: "/dashboard",
     },
     {
-      title: "Surveys",
+      title: "Cases & Assessment",
       url: "/surveys",
     },
     {
@@ -42,6 +42,10 @@ const data = {
       url: "/providers",
     },
     {
+      title: "Work Queue",
+      url: "/work-queue",
+    },
+    {
       title: "Workflows",
       url: "/workflows",
     },
@@ -50,6 +54,10 @@ const data = {
     {
       title: "Reports",
       url: "/reports",
+    },
+    {
+      title: "Integration",
+      url: "/integration",
     },
     {
       title: "Settings",
@@ -76,7 +84,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">CHC Insight</span>
-                  <span className="truncate text-xs">CRM Platform</span>
                 </div>
               </Link>
             </SidebarMenuButton>

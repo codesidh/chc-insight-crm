@@ -1,0 +1,180 @@
+# Production Dockerfile for CHC Insight CRM Frontend
+# Multi-stage build for optimized production image
+
+# Build stage
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY next.config.ts ./
+COPY tailwind.config.js ./
+COPY postcss.config.mjs ./
+COPY tsconfig.json ./
+COPY components.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY src/ ./src/
+COPY public/ ./public/
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install security updates and nginx
+RUN apk update && apk upgrade && \
+    apk add --no-cache nginx dumb-init && \
+    rm -rf /var/cache/apk/*
+
+# Create app user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S frontend -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files for production dependencies
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application from builder stage
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
+# Create nginx configuration
+COPY <<EOF /etc/nginx/nginx.conf
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    
+    log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                    '\$status \$body_bytes_sent "\$http_referer" '
+                    '"\$http_user_agent" "\$http_x_forwarded_for"';
+    
+    access_log /var/log/nginx/access.log main;
+    
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/atom+xml
+        image/svg+xml;
+    
+    # Security headers
+    add_header X-Frame-Options DENY always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    
+    server {
+        listen 3000;
+        server_name _;
+        
+        # Security
+        server_tokens off;
+        
+        # Static files
+        location /_next/static/ {
+            alias /app/.next/static/;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        location /static/ {
+            alias /app/public/;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        # Next.js app
+        location / {
+            proxy_pass http://localhost:3001;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade \$http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+            proxy_cache_bypass \$http_upgrade;
+        }
+        
+        # Health check
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
+}
+EOF
+
+# Change ownership to app user
+RUN chown -R frontend:nodejs /app
+
+# Create startup script
+COPY <<EOF /app/start.sh
+#!/bin/sh
+# Start nginx in background
+nginx -g "daemon off;" &
+
+# Start Next.js application
+exec node server.js
+EOF
+
+RUN chmod +x /app/start.sh && chown frontend:nodejs /app/start.sh
+
+# Switch to non-root user
+USER frontend
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["/app/start.sh"]

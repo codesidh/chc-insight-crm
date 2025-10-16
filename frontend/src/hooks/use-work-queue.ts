@@ -207,3 +207,85 @@ export function useWorkQueueStats(userId: string) {
     refetchInterval: 5 * 60 * 1000,
   })
 }
+
+// Main work queue hook that combines all functionality
+export function useWorkQueue(userId: string = 'current-user-id') {
+  const tasksQuery = useWorkQueueTasks(userId)
+  const assignTaskMutation = useAssignTask()
+  const updateTaskStatusMutation = useUpdateTaskStatus()
+  const statsQuery = useWorkQueueStats(userId)
+
+  // Mock tasks for development
+  const mockTasks = [
+    {
+      id: '1',
+      formName: 'Member Satisfaction Survey',
+      memberName: 'John Doe',
+      providerName: 'Healthcare Plus',
+      status: 'pending',
+      priority: 4,
+      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      assignedTo: null,
+      assignedToName: null,
+      formInstanceId: 'instance-1'
+    },
+    {
+      id: '2',
+      formName: 'Provider Quality Assessment',
+      memberName: 'Jane Smith',
+      providerName: 'Medical Center',
+      status: 'in_progress',
+      priority: 3,
+      dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+      assignedTo: 'current-user-id',
+      assignedToName: 'Current User',
+      formInstanceId: 'instance-2'
+    },
+    {
+      id: '3',
+      formName: 'Health Risk Assessment',
+      memberName: 'Bob Johnson',
+      providerName: null,
+      status: 'pending',
+      priority: 2,
+      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      assignedTo: 'other-user-id',
+      assignedToName: 'Other User',
+      formInstanceId: 'instance-3'
+    }
+  ]
+
+  const tasks = tasksQuery.data?.data?.data || mockTasks
+  const isLoading = tasksQuery.isLoading
+
+  const assignTask = (taskId: string, assigneeId: string) => {
+    return assignTaskMutation.mutate({ taskId, assigneeId })
+  }
+
+  const updateTaskStatus = (taskId: string, status: string, comment?: string) => {
+    return updateTaskStatusMutation.mutate({ 
+      taskId, 
+      status, 
+      ...(comment !== undefined && { comment })
+    })
+  }
+
+  const getTasksByStatus = (status: string) => {
+    return tasks.filter((task: any) => task.status === status)
+  }
+
+  const getTasksByPriority = (minPriority: number) => {
+    return tasks.filter((task: any) => task.priority >= minPriority)
+  }
+
+  return {
+    tasks,
+    isLoading,
+    assignTask,
+    updateTaskStatus,
+    getTasksByStatus,
+    getTasksByPriority,
+    stats: statsQuery.data,
+    refetch: tasksQuery.refetch
+  }
+}

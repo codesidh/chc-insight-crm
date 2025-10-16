@@ -5,12 +5,16 @@ import compression from 'compression';
 import config from '@/config/environment';
 import { errorHandler } from '@/middleware/errorHandler';
 import { requestLogger } from '@/middleware/requestLogger';
+import { auditMiddleware } from '@/middleware/audit.middleware';
+import { securityHeadersMiddleware, rateLimitMiddleware } from '@/middleware/security-headers.middleware';
+// Validation middleware available for use
 import { DatabaseService } from '@/services/database.service';
 import { createAuthRoutes } from '@/routes/auth.routes';
 
 import formHierarchyRoutes from '@/routes/form-hierarchy.routes';
 import formBuilderRoutes from '@/routes/form-builder.routes';
 import memberProviderRoutes from '@/routes/member-provider-lookup.routes';
+import integrationRoutes from '@/routes/integration.routes';
 
 const app = express();
 
@@ -61,8 +65,24 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Security headers middleware
+app.use(securityHeadersMiddleware);
+
+// Rate limiting middleware
+app.use('/api/', rateLimitMiddleware({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 100 // requests per window
+}));
+
 // Request logging middleware
 app.use(requestLogger);
+
+// Audit logging middleware
+app.use('/api/', auditMiddleware({
+  logFormAccess: true,
+  logDataAccess: true,
+  logAllRequests: false // Set to true for comprehensive logging
+}));
 
 // Health check endpoint
 app.get('/health', async (_req, res) => {
@@ -119,6 +139,9 @@ app.use('/api', formBuilderRoutes);
 
 // Member and provider lookup routes
 app.use('/api', memberProviderRoutes);
+
+// Integration and health check routes
+app.use('/api', integrationRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

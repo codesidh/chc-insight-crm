@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Shield, Database, Settings, HelpCircle, Search } from "lucide-react"
+import { Shield, Settings, HelpCircle } from "lucide-react"
 
 import {
   SidebarGroup,
@@ -13,12 +13,9 @@ import {
 } from "@/components/ui/sidebar"
 
 const iconMap = {
-  "/compliance": Shield,
-  "/data": Database,
+  "/reports": Shield,
   "/settings": Settings,
-  Settings,
-  "Get Help": HelpCircle,
-  Search,
+  "/examples": HelpCircle 
 }
 
 export function NavSecondary({
