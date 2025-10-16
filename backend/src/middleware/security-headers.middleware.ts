@@ -28,7 +28,7 @@ class SecurityHeadersManager {
 
   constructor(config: Partial<SecurityConfig> = {}) {
     this.config = {
-      enforceHttps: process.env['NODE_ENV'] === 'production',
+      enforceHttps: false, // Disable HTTPS enforcement for Docker deployment
       hsts: {
         maxAge: 31536000, // 1 year
         includeSubDomains: true,
@@ -67,12 +67,12 @@ class SecurityHeadersManager {
   /**
    * Apply security headers to response
    */
-  applyHeaders(req: Request, res: Response): void {
+  applyHeaders(req: Request, res: Response): boolean {
     // HTTPS enforcement
     if (this.config.enforceHttps && !req.secure && req.get('X-Forwarded-Proto') !== 'https') {
       const httpsUrl = `https://${req.get('Host')}${req.url}`;
       res.redirect(301, httpsUrl);
-      return;
+      return false; // Indicate that response was sent
     }
 
     // HTTP Strict Transport Security (HSTS)
@@ -133,6 +133,8 @@ class SecurityHeadersManager {
     if (req.path.startsWith('/api/')) {
       this.applyCorsHeaders(req, res);
     }
+
+    return true; // Indicate that processing should continue
   }
 
   /**
@@ -201,8 +203,11 @@ const securityManager = new SecurityHeadersManager();
  * Security headers middleware
  */
 export const securityHeadersMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  securityManager.applyHeaders(req, res);
-  next();
+  const shouldContinue = securityManager.applyHeaders(req, res);
+  if (shouldContinue !== false) {
+    next();
+  }
+  // If shouldContinue is false, response was already sent (redirect), so don't call next()
 };
 
 /**

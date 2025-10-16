@@ -1,0 +1,11 @@
+# Frontend Docker Ignore - MINIMAL RUNTIME ONLY
+# Only allow essential runtime files for Next.js standalone
+
+# Exclude everything by default
+*
+
+# Allow only essential runtime files
+!.next/standalone/
+!.next/static/
+!public/
+!package.json

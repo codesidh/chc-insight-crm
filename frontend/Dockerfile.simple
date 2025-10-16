@@ -1,5 +1,5 @@
-# Production Dockerfile for CHC Insight CRM Frontend
-# Runtime-only image - assumes .next/standalone is already built locally
+# Simple Dockerfile for CHC Insight CRM Frontend
+# Installs dependencies in container
 
 FROM node:18-alpine
 
@@ -13,7 +13,13 @@ RUN addgroup -g 1001 -S nodejs && \
 # Set working directory
 WORKDIR /app
 
-# Copy the standalone Next.js application (includes its own node_modules)
+# Copy package files
+COPY package.json ./
+
+# Install dependencies
+RUN npm install --only=production && npm cache clean --force
+
+# Copy the built application
 COPY .next/standalone/ ./
 COPY .next/static/ ./.next/static/
 COPY public/ ./public/
@@ -29,7 +35,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
+  CMD curl -f http://localhost:3000 || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]

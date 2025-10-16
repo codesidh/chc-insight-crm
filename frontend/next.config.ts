@@ -8,6 +8,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig: NextConfig = {
   // Workspace configuration
   outputFileTracingRoot: process.cwd(),
+  
+  // Docker production build
+  output: 'standalone',
 
   // Build optimizations
   experimental: {
@@ -19,6 +22,11 @@ const nextConfig: NextConfig = {
       '@tanstack/react-table',
       'recharts'
     ],
+  },
+
+  // Disable cache in production builds
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
   },
 
   // Webpack optimizations for bundle splitting

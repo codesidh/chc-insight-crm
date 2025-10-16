@@ -1,6 +1,6 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
-const environment_1 = require('./src/config/environment');
+const environment_1 = require('./dist/config/environment');
 const knexConfig = {
   development: {
     client: 'postgresql',

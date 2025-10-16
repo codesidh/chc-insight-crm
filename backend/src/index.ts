@@ -68,6 +68,36 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Security headers middleware
 app.use(securityHeadersMiddleware);
 
+// Health check endpoint (before middleware to avoid conflicts)
+app.get('/health', async (_req, res) => {
+  try {
+    const dbHealth = await DatabaseService.healthCheck();
+    const isHealthy = dbHealth.overall;
+
+    // Ensure we only send one response
+    if (!res.headersSent) {
+      res.status(isHealthy ? 200 : 503).json({
+        status: isHealthy ? 'healthy' : 'unhealthy',
+        timestamp: new Date().toISOString(),
+        version: process.env['npm_package_version'] || '1.0.0',
+        environment: config.nodeEnv,
+        database: dbHealth,
+      });
+    }
+  } catch (error) {
+    // Ensure we only send one response
+    if (!res.headersSent) {
+      res.status(503).json({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        version: process.env['npm_package_version'] || '1.0.0',
+        environment: config.nodeEnv,
+        error: 'Database health check failed',
+      });
+    }
+  }
+});
+
 // Rate limiting middleware
 app.use('/api/', rateLimitMiddleware({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -84,30 +114,6 @@ app.use('/api/', auditMiddleware({
   logAllRequests: false // Set to true for comprehensive logging
 }));
 
-// Health check endpoint
-app.get('/health', async (_req, res) => {
-  try {
-    const dbHealth = await DatabaseService.healthCheck();
-    const isHealthy = dbHealth.overall;
-
-    res.status(isHealthy ? 200 : 503).json({
-      status: isHealthy ? 'healthy' : 'unhealthy',
-      timestamp: new Date().toISOString(),
-      version: process.env['npm_package_version'] || '1.0.0',
-      environment: config.nodeEnv,
-      database: dbHealth,
-    });
-  } catch (error) {
-    res.status(503).json({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      version: process.env['npm_package_version'] || '1.0.0',
-      environment: config.nodeEnv,
-      error: 'Database health check failed',
-    });
-  }
-});
-
 // Initialize routes after database is available
 let authRoutes: express.Router;
 
@@ -117,6 +123,91 @@ app.get('/api', (_req, res) => {
     message: 'CHC Insight CRM API',
     version: '1.0.0',
     documentation: '/api/docs',
+  });
+});
+
+// API Documentation (public access)
+app.get('/api/docs', (_req, res) => {
+  res.json({
+    title: 'CHC Insight CRM API Documentation',
+    version: '1.0.0',
+    description: 'Long-Term Services and Supports (LTSS) Case and Assessment Management API',
+    baseUrl: '/api',
+    endpoints: {
+      authentication: {
+        'POST /api/auth/login': 'User login',
+        'POST /api/auth/logout': 'User logout',
+        'POST /api/auth/refresh': 'Refresh access token',
+        'GET /api/auth/me': 'Get current user profile'
+      },
+      formHierarchy: {
+        'GET /api/form-categories': 'List form categories',
+        'POST /api/form-categories': 'Create form category',
+        'GET /api/form-categories/:id': 'Get form category',
+        'PUT /api/form-categories/:id': 'Update form category',
+        'DELETE /api/form-categories/:id': 'Delete form category',
+        'GET /api/form-types': 'List form types',
+        'POST /api/form-types': 'Create form type',
+        'GET /api/form-types/:id': 'Get form type',
+        'PUT /api/form-types/:id': 'Update form type',
+        'DELETE /api/form-types/:id': 'Delete form type'
+      },
+      formBuilder: {
+        'GET /api/form-templates': 'List form templates',
+        'POST /api/form-templates': 'Create form template',
+        'GET /api/form-templates/:id': 'Get form template',
+        'PUT /api/form-templates/:id': 'Update form template',
+        'DELETE /api/form-templates/:id': 'Delete form template',
+        'POST /api/form-templates/:id/copy': 'Copy form template',
+        'GET /api/form-instances': 'List form instances',
+        'POST /api/form-instances': 'Create form instance',
+        'GET /api/form-instances/:id': 'Get form instance',
+        'PUT /api/form-instances/:id': 'Update form instance',
+        'POST /api/form-instances/:id/submit': 'Submit form instance'
+      },
+      memberProvider: {
+        'GET /api/members/search': 'Search members',
+        'GET /api/members/:id': 'Get member details',
+        'GET /api/providers/search': 'Search providers',
+        'GET /api/providers/:id': 'Get provider details'
+      },
+      integration: {
+        'GET /api/integration/status': 'Get integration status',
+        'POST /api/integration/sync': 'Trigger data sync'
+      },
+      system: {
+        'GET /health': 'System health check',
+        'GET /api': 'API information',
+        'GET /api/docs': 'This documentation'
+      }
+    },
+    authentication: {
+      type: 'Bearer Token (JWT)',
+      header: 'Authorization: Bearer <token>',
+      loginEndpoint: '/api/auth/login',
+      note: 'Most endpoints require authentication except /health, /api, and /api/docs'
+    },
+    defaultCredentials: {
+      email: 'admin@chc-insight.com',
+      password: 'admin123',
+      note: 'Default admin credentials for initial setup'
+    },
+    responseFormat: {
+      success: {
+        success: true,
+        data: '...',
+        metadata: {
+          timestamp: '2025-01-01T00:00:00.000Z'
+        }
+      },
+      error: {
+        success: false,
+        error: {
+          code: 'ERROR_CODE',
+          message: 'Error description'
+        }
+      }
+    }
   });
 });
 

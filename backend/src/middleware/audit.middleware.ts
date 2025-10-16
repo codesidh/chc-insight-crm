@@ -182,76 +182,72 @@ export const auditMiddleware = (options: {
   logFormAccess?: boolean;
   logDataAccess?: boolean;
 } = {}) => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const startTime = Date.now();
     
-    // Store original res.json to capture response
-    const originalJson = res.json;
-    
-    res.json = function(body: any) {
-      return originalJson.call(this, body);
-    };
-
-    // Continue with request
+    // Continue with request first
     next();
 
-    // Log after response is sent
-    res.on('finish', async () => {
-      try {
-        const user = req.user;
-        if (!user) return; // Skip if no authenticated user
+    // Log after response is sent (non-blocking)
+    res.on('finish', () => {
+      // Use setImmediate to avoid blocking the response
+      setImmediate(async () => {
+        try {
+          const user = req.user;
+          if (!user) return; // Skip if no authenticated user
 
-        const duration = Date.now() - startTime;
-        const metadata = {
-          duration,
-          responseSize: res.get('Content-Length'),
-          success: res.statusCode < 400
-        };
+          const duration = Date.now() - startTime;
+          const metadata = {
+            duration,
+            responseSize: res.get('Content-Length'),
+            success: res.statusCode < 400
+          };
 
-        // Log based on request path and options
-        if (options.logFormAccess && req.path.includes('/form')) {
-          await auditLogger.logFormAccess(
-            user.userId,
-            user.tenantId,
-            req.method === 'GET' ? 'view' : 
-            req.method === 'POST' ? 'create' :
-            req.method === 'PUT' || req.method === 'PATCH' ? 'update' : 'delete',
-            req.path.includes('/categories') ? 'category' :
-            req.path.includes('/types') ? 'type' :
-            req.path.includes('/templates') ? 'template' : 'instance',
-            req.params['id'] || 'unknown',
-            req,
-            metadata
-          );
-        } else if (options.logDataAccess && (req.path.includes('/members') || req.path.includes('/providers'))) {
-          await auditLogger.logDataAccess(
-            user.userId,
-            user.tenantId,
-            req.method === 'GET' ? 'read' : 'search',
-            req.path.includes('/members') ? 'member' : 'provider',
-            req,
-            metadata
-          );
-        } else if (options.logAllRequests) {
-          await auditLogger.logEntry({
-            userId: user.userId,
-            tenantId: user.tenantId,
-            action: `api_${req.method.toLowerCase()}`,
-            resource: 'api_endpoint',
-            resourceId: req.path,
-            ipAddress: auditLogger['getClientIp'](req),
-            userAgent: req.get('User-Agent') || 'Unknown',
-            requestMethod: req.method,
-            requestPath: req.path,
-            requestBody: auditLogger['sanitizeRequestBody'](req.body),
-            responseStatus: res.statusCode,
-            sessionId: (req as any).session?.id,
-            metadata
-          });
+          // Log based on request path and options
+          if (options.logFormAccess && req.path.includes('/form')) {
+            await auditLogger.logFormAccess(
+              user.userId,
+              user.tenantId,
+              req.method === 'GET' ? 'view' : 
+              req.method === 'POST' ? 'create' :
+              req.method === 'PUT' || req.method === 'PATCH' ? 'update' : 'delete',
+              req.path.includes('/categories') ? 'category' :
+              req.path.includes('/types') ? 'type' :
+              req.path.includes('/templates') ? 'template' : 'instance',
+              req.params['id'] || 'unknown',
+              req,
+              metadata
+            );
+          } else if (options.logDataAccess && (req.path.includes('/members') || req.path.includes('/providers'))) {
+            await auditLogger.logDataAccess(
+              user.userId,
+              user.tenantId,
+              req.method === 'GET' ? 'read' : 'search',
+              req.path.includes('/members') ? 'member' : 'provider',
+              req,
+              metadata
+            );
+          } else if (options.logAllRequests) {
+            await auditLogger.logEntry({
+              userId: user.userId,
+              tenantId: user.tenantId,
+              action: `api_${req.method.toLowerCase()}`,
+              resource: 'api_endpoint',
+              resourceId: req.path,
+              ipAddress: auditLogger['getClientIp'](req),
+              userAgent: req.get('User-Agent') || 'Unknown',
+              requestMethod: req.method,
+              requestPath: req.path,
+              requestBody: auditLogger['sanitizeRequestBody'](req.body),
+              responseStatus: res.statusCode,
+              sessionId: (req as any).session?.id,
+              metadata
+            });
+          }
+        } catch (error) {
+          console.error('Audit middleware error:', error);
         }
-      } catch (error) {
-        console.error('Audit middleware error:', error);
-      }
+      });
     });
   };
 };

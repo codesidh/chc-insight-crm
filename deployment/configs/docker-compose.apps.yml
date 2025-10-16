@@ -1,0 +1,94 @@
+version: '3.8'
+
+# Application services that can be updated frequently
+# Backend and Frontend applications
+
+services:
+  # Backend API - Application Layer
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.production
+      args:
+        NODE_ENV: production
+    container_name: chc-crm-backend
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # Use external infrastructure
+      DB_HOST: postgres
+      DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Override database name for production
+      PRODUCTION_DATABASE_NAME: chc_insight_crm
+      PRODUCTION_DATABASE_HOST: postgres
+      PRODUCTION_DATABASE_USERNAME: postgres
+      PRODUCTION_DATABASE_PASSWORD: secure_password_123
+    ports:
+      - "3001:3001"
+    networks:
+      - chc-network
+    # Note: Depends on external infrastructure services
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # Frontend Application - Application Layer
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile.production
+      args:
+        NODE_ENV: production
+        NEXT_TELEMETRY_DISABLED: 1
+    container_name: chc-crm-frontend
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+      NEXT_TELEMETRY_DISABLED: 1
+    ports:
+      - "3000:3000"
+    networks:
+      - chc-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+
+networks:
+  chc-network:
+    name: chc-crm-network
+    external: true
+
+# Note: No volumes defined here - apps are stateless
+# All data is stored in infrastructure layer (postgres/redis)

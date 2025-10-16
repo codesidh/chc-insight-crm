@@ -47,5 +47,8 @@
     "workflow"
   ],
   "author": "Sridhar Natarajan",
-  "license": "LICENSED"
+  "license": "LICENSED",
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
 }

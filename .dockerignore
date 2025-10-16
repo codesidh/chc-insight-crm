@@ -1,0 +1,139 @@
+# Root Docker Ignore File
+# For multi-service builds and general Docker operations
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Environment files
+.env*
+!.env.production.example
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Build outputs
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.next/
+out/
+
+# Logs
+logs/
+*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.backup
+*.bak
+
+# CI/CD files
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Docker files (avoid recursion)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Deployment scripts
+deploy*.sh
+deploy*.ps1
+deploy-mvp.ps1
+
+# Monitoring and configuration (not needed in containers)
+monitoring/
+nginx/ssl/
+backups/
+
+# Development tools configuration (keep essential ones for builds)
+.eslintrc*
+.prettierrc*
+jest.config.*
+nodemon.json
+
+# Keep essential build configuration files
+!tsconfig*.json
+!tailwind.config.*
+!postcss.config.*
+!next.config.*
+!components.json
+
+# Testing
+test-results/
+playwright-report/
+playwright/.cache/
+coverage/
+*.test.*
+*.spec.*
+
+# Cache directories
+.cache/
+.parcel-cache/
+.webpack/
+.eslintcache
+.prettiercache
+.stylelintcache
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional directories
+jspm_packages/
+.nyc_output
+
+# Package manager files (keep essential ones for builds)
+yarn.lock
+.pnp
+.pnp.js
+
+# Keep package-lock.json for Docker builds
+!package-lock.json
+
+# Storybook
+.out
+.storybook-out
+storybook-static/
+
+# Large example directories
+frontend/src/examples/
+frontend/public/examples/
+
+# Kiro IDE files
+.kiro/
