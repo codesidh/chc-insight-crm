@@ -1,150 +1,81 @@
 {
-  "appName": "CHC Insight",
-  "welcomeMessage": {
-    "title": "Welcome to CHC Insight",
-    "description": "Comprehensive CRM for Long-Term Services and Supports (LTSS) within MCO environments."
+  "metrics": {
+    "totalCategories": 3,
+    "totalTypes": 9,
+    "totalTemplates": 25,
+    "totalInstances": 140,
+    "draftInstances": 35,
+    "pendingInstances": 55,
+    "approvedInstances": 35,
+    "completedInstances": 15
   },
-  "stats": [
-    {
-      "id": "active-surveys",
-      "title": "Active Surveys",
-      "value": "12",
-      "change": "+2",
-      "changeLabel": "from last month",
-      "icon": "FileText",
-      "changeType": "positive"
-    },
-    {
-      "id": "total-members",
-      "title": "Total Members",
-      "value": "2,847",
-      "change": "+180",
-      "changeLabel": "from last month",
-      "icon": "Users",
-      "changeType": "positive"
-    },
-    {
-      "id": "completion-rate",
-      "title": "Completion Rate",
-      "value": "94.2%",
-      "change": "+2.1%",
-      "changeLabel": "from last month",
-      "icon": "TrendingUp",
-      "changeType": "positive"
-    },
-    {
-      "id": "pending-reviews",
-      "title": "Pending Reviews",
-      "value": "23",
-      "change": "-5",
-      "changeLabel": "from yesterday",
-      "icon": "Activity",
-      "changeType": "negative"
-    }
-  ],
-  "featureCards": [
-    {
-      "id": "dynamic-surveys",
-      "title": "Dynamic Surveys",
-      "description": "Create surveys with conditional logic",
-      "icon": "FileText",
-      "buttonText": "Manage Surveys"
-    },
-    {
-      "id": "analytics-reports",
-      "title": "Analytics & Reports",
-      "description": "Performance and compliance tracking",
-      "icon": "BarChart3",
-      "buttonText": "View Analytics"
-    },
-    {
-      "id": "member-management",
-      "title": "Member Management",
-      "description": "Track member information and status",
-      "icon": "Users",
-      "buttonText": "Manage Members"
-    }
-  ],
   "recentActivity": [
     {
-      "id": "survey-completed",
-      "title": "Survey \"Member Satisfaction Q4\" completed",
-      "time": "2 hours ago",
-      "icon": "CheckCircle",
-      "iconColor": "green"
+      "id": "1",
+      "type": "instance_completed",
+      "title": "Member Assessment Completed",
+      "description": "John Doe - Care Plan Review",
+      "timestamp": "2024-01-15T14:30:00Z",
+      "status": "success"
     },
     {
-      "id": "members-added",
-      "title": "45 new members added to system",
-      "time": "5 hours ago",
-      "icon": "Users",
-      "iconColor": "blue"
+      "id": "2",
+      "type": "template_updated",
+      "title": "Template Updated",
+      "description": "Provider Quality Survey v2.1",
+      "timestamp": "2024-01-15T14:15:00Z",
+      "status": "success"
     },
     {
-      "id": "workflow-pending",
-      "title": "Workflow approval pending review",
-      "time": "1 day ago",
-      "icon": "Clock",
-      "iconColor": "yellow"
+      "id": "3",
+      "type": "workflow_approved",
+      "title": "Workflow Approved",
+      "description": "Survey deployment pending",
+      "timestamp": "2024-01-15T13:30:00Z",
+      "status": "pending"
+    },
+    {
+      "id": "4",
+      "type": "form_created",
+      "title": "New Form Template",
+      "description": "Member Satisfaction Survey",
+      "timestamp": "2024-01-15T12:30:00Z",
+      "status": "success"
     }
   ],
-  "systemStatus": [
+  "formHierarchy": [
     {
-      "id": "frontend-infrastructure",
-      "title": "Frontend Infrastructure",
-      "status": "Complete",
-      "variant": "default",
-      "icon": "CheckCircle"
+      "category_id": "1",
+      "category_name": "Member Assessments",
+      "type_count": "3",
+      "template_count": "8",
+      "instance_count": "45",
+      "draft_count": "12",
+      "pending_count": "18",
+      "approved_count": "10",
+      "completed_count": "5"
     },
     {
-      "id": "backend-infrastructure",
-      "title": "Backend Infrastructure",
-      "status": "Complete",
-      "variant": "default",
-      "icon": "CheckCircle"
+      "category_id": "2",
+      "category_name": "Provider Evaluations",
+      "type_count": "2",
+      "template_count": "5",
+      "instance_count": "28",
+      "draft_count": "8",
+      "pending_count": "12",
+      "approved_count": "6",
+      "completed_count": "2"
     },
     {
-      "id": "ui-components",
-      "title": "UI Components",
-      "status": "Complete",
-      "variant": "default",
-      "icon": "CheckCircle"
-    },
-    {
-      "id": "survey-engine",
-      "title": "Survey Engine",
-      "status": "In Progress",
-      "variant": "secondary",
-      "icon": "Clock"
-    },
-    {
-      "id": "authentication-system",
-      "title": "Authentication System",
-      "status": "Pending",
-      "variant": "outline",
-      "icon": "AlertCircle"
-    }
-  ],
-  "quickActions": [
-    {
-      "id": "create-survey",
-      "title": "Create Survey",
-      "icon": "FileText"
-    },
-    {
-      "id": "add-member",
-      "title": "Add Member",
-      "icon": "Users"
-    },
-    {
-      "id": "view-reports",
-      "title": "View Reports",
-      "icon": "BarChart3"
-    },
-    {
-      "id": "schedule-review",
-      "title": "Schedule Review",
-      "icon": "Calendar"
+      "category_id": "3",
+      "category_name": "Quality Surveys",
+      "type_count": "4",
+      "template_count": "12",
+      "instance_count": "67",
+      "draft_count": "15",
+      "pending_count": "25",
+      "approved_count": "20",
+      "completed_count": "7"
     }
   ]
 }

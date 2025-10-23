@@ -2,31 +2,24 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { 
-  FileText, 
-  Home, 
-  Users, 
-  Workflow,
-  Plus,
-  BriefcaseMedical
-} from "lucide-react"
+import { ChevronRight, type LucideIcon } from "lucide-react"
 
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
   SidebarGroup,
-  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-
-const iconMap = {
-  "/": Home,
-  "/dashboard": Home,
-  "/surveys": FileText,
-  "/members": Users,
-  "/providers": BriefcaseMedical,
-  "/workflows": Workflow,
-}
 
 export function NavMain({
   items,
@@ -34,41 +27,93 @@ export function NavMain({
   items: {
     title: string
     url: string
+    icon: LucideIcon
+    isActive?: boolean
+    items?: {
+      title: string
+      url: string
+    }[]
   }[]
 }) {
   const pathname = usePathname()
+
+  // Helper function to check if a menu item or its subitems are active
+  const isItemActive = (item: typeof items[0]) => {
+    // Handle root path - if we're at "/" and item is "/dashboard", consider it active
+    if (pathname === "/" && item.url === "/dashboard") return true
+    
+    // Check if main item URL matches current path
+    if (pathname === item.url) return true
+    
+    // Check if any subitem URL matches current path
+    if (item.items) {
+      return item.items.some(subItem => {
+        // Handle root path for subitems too
+        if (pathname === "/" && subItem.url === "/dashboard") return true
+        return pathname === subItem.url || pathname.startsWith(`${subItem.url}/`)
+      })
+    }
+    
+    // Check if current path starts with item URL (for nested routes)
+    return pathname.startsWith(`${item.url}/`)
+  }
+
+  // Helper function to check if submenu should be open
+  const shouldBeOpen = (item: typeof items[0]) => {
+    return isItemActive(item) || item.isActive
+  }
+
   return (
     <SidebarGroup>
-      <SidebarGroupContent className="flex flex-col gap-2">
-        <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarMenu>
-          {items.map((item) => {
-            const Icon = iconMap[item.url as keyof typeof iconMap] || Home
-            const isActive = pathname === item.url || (pathname === "/" && item.url === "/dashboard")
-            
-            return (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title} asChild isActive={isActive}>
+      <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
+      <SidebarMenu>
+        {items.map((item) => {
+          const itemActive = isItemActive(item)
+          const shouldOpen = shouldBeOpen(item)
+          
+          return (
+            <Collapsible key={item.title} asChild defaultOpen={shouldOpen || false}>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={itemActive}>
                   <Link href={item.url}>
-                    <Icon className="h-4 w-4" />
+                    <item.icon />
                     <span>{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
+                {item.items?.length ? (
+                  <>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuAction className="data-[state=open]:rotate-90">
+                        <ChevronRight />
+                        <span className="sr-only">Toggle</span>
+                      </SidebarMenuAction>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items?.map((subItem) => {
+                          const subItemActive = (pathname === "/" && subItem.url === "/dashboard") || 
+                                                         pathname === subItem.url || 
+                                                         pathname.startsWith(`${subItem.url}/`)
+                          
+                          return (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton asChild isActive={subItemActive}>
+                                <Link href={subItem.url}>
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          )
+                        })}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </>
+                ) : null}
               </SidebarMenuItem>
-            )
-          })}
-        </SidebarMenu>
-      </SidebarGroupContent>
+            </Collapsible>
+          )
+        })}
+      </SidebarMenu>
     </SidebarGroup>
   )
 }

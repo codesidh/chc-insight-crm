@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Shield, Settings, HelpCircle } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { type LucideIcon } from "lucide-react"
 
 import {
   SidebarGroup,
@@ -12,12 +13,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const iconMap = {
-  "/reports": Shield,
-  "/settings": Settings,
-  "/examples": HelpCircle 
-}
-
 export function NavSecondary({
   items,
   ...props
@@ -25,19 +20,23 @@ export function NavSecondary({
   items: {
     title: string
     url: string
+    icon: LucideIcon
   }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  const pathname = usePathname()
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            const Icon = iconMap[item.title as keyof typeof iconMap] || iconMap[item.url as keyof typeof iconMap] || Settings
+            const isActive = pathname === item.url || pathname.startsWith(`${item.url}/`)
+            
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild size="sm" isActive={isActive}>
                   <Link href={item.url}>
-                    <Icon className="h-4 w-4" />
+                    <item.icon />
                     <span>{item.title}</span>
                   </Link>
                 </SidebarMenuButton>

@@ -274,3 +274,22 @@ export interface BreadcrumbItem {
   type: 'category' | 'type' | 'template';
   href?: string;
 }
+
+// API Response types
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: ApiError;
+  metadata?: {
+    total?: number;
+    page?: number;
+    limit?: number;
+    timestamp: Date;
+  };
+}
+
+export interface ApiError {
+  code: string;
+  message: string;
+  details?: Record<string, any>;
+}
